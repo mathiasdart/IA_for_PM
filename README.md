@@ -4,7 +4,7 @@ Application B2B d’aide au contrôle visuel des équipements d’une salle. Le 
 
 ## État de la livraison
 
-**Milestone 1 : interface, sources et configuration.** La détection, les compteurs d’audit et le rapport ne sont pas encore activés. Aucun résultat artificiel n’est présenté. La validation du propriétaire est requise avant de commencer le milestone 2.
+**Milestone 2 : détection et audit, en recette.** Le passage à M2 a été autorisé par le propriétaire après la livraison M1. Le rapport et ses exports restent prévus à M3. Aucun résultat artificiel n’est présenté dans l’application.
 
 - Interface responsive en français et navigation au clavier.
 - Import local JPEG, PNG et WebP, maximum 15 Mo et 40 mégapixels ; redimensionnement d’affichage à 1920 px maximum.
@@ -12,6 +12,10 @@ Application B2B d’aide au contrôle visuel des équipements d’une salle. Le 
 - Arrêt de la caméra lors d’un changement de source ou lorsque la page devient masquée.
 - Nom de salle et configuration de six catégories, quantités entières de 0 à 999.
 - Les valeurs d’exemple sont signalées et peuvent être rétablies.
+- Détection COCO-SSD chargée à la demande, cadres et scores individuels ; seuil entre 20 et 95 %.
+- Audit d’une image figée : une capture webcam arrête le flux ; un changement de source invalide les résultats.
+- Comptages, écarts par catégorie et statut partiel recalculés selon le seuil et le référentiel.
+- Échec du téléchargement expliqué avec nouvelle tentative. Un objet non détecté n’est jamais déclaré absent.
 - Ni stockage persistant ni envoi de l’image. Les pixels restent temporairement en mémoire jusqu’au changement de source ou au nouvel audit.
 
 ## Démarrer
@@ -46,30 +50,37 @@ Si Chromium est déjà installé sur la machine :
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e
 ```
 
-Ces tests vérifient le parcours avec des médias synthétiques et des autorisations simulées. Ils ne prouvent ni la qualité d’une future détection IA ni le fonctionnement d’une webcam physique. La recette utilisateur complète ces contrôles.
+Ces tests vérifient le parcours avec des médias synthétiques et des autorisations simulées. Un graphe synthétique teste le vrai runtime TensorFlow, ses sorties et la libération des tenseurs. Cela ne prouve ni la qualité de COCO-SSD sur des photographies ni le fonctionnement d’une webcam physique.
+
+Pour l’évaluation réelle, voir [le protocole M2 et l’outil de mesure](docs/VALIDATION-M2.md). Les tests simulés et les mesures de vision sont comptabilisés séparément.
 
 ## Architecture
 
-Frontend statique HTML, CSS et JavaScript ES modules, assemblé par Vite. Aucune API métier ni base de données au milestone 1. Le code produit n’a pas de dépendance runtime externe.
+Frontend statique HTML, CSS et JavaScript ES modules, assemblé par Vite. Aucune API métier ni base de données. TensorFlow.js 4.22.0 est une dépendance runtime versionnée, compilée dans un module chargé à la demande. Les poids du modèle sont téléchargés depuis Google Cloud Storage ; aucune image n’est envoyée à ce service.
 
 ```text
 index.html                    Structure et parcours
 src/app.js                    État de la session, sources et interactions
 src/configuration.js          Catalogue, quantités et validations
+src/audit.js                  Règles et indicateurs d’audit
+src/detector.js               Chargement TensorFlow et exécution du graphe
+src/model-spec.js             Provenance et paramètres du modèle
+src/detection-postprocess.js  Classes d’équipements, cadres et doublons
 src/icons.js                  Icônes SVG locales
 src/style.css                 Interface et responsive
 public/                       Favicon et en-têtes Cloudflare
 tests/                        Tests unitaires et parcours navigateur
 docs/                         Plan, décisions et guide de livraison
+scripts/                      Évaluation de vision sur annotations
 ```
 
 ## Décision IA
 
 Décision validée le 16 octobre 2026 : **COCO-SSD préentraîné pour le MVP, amélioration métier ensuite**. Nous ne réentraînons pas les poids dans ce MVP. Évaluer des images annotées et régler un seuil de confiance ne constitue pas un entraînement.
 
-Le milestone 2 doit intégrer TensorFlow.js avec COCO-SSD et documenter les dépendances de chargement du modèle. L’application devra restituer uniquement les détections réellement produites pour les équipements autorisés.
+Le moteur charge le graphe **SSDLite MobileNet v2** utilisé par COCO-SSD. Il lit uniquement les quatre colonnes de scores d’équipements, choisit la meilleure classe autorisée par boîte puis applique une suppression des doublons par catégorie (IoU > 0,5). Le plancher de calcul est 20 % et la limite 100 détections par image, explicitement signalée si atteinte. Ce post-traitement est décrit dans [la documentation du modèle](docs/MODEL.md) et doit être évalué sur notre jeu d’images.
 
-| Équipement | Classe COCO-SSD prévue | Limite |
+| Équipement | Classe COCO-SSD | Limite |
 | --- | --- | --- |
 | Chaises | `chair` | Objets visibles et suffisamment reconnus |
 | Tables et bureaux | `dining table` | Classe approchante, couverture incomplète des bureaux |
@@ -78,9 +89,9 @@ Le milestone 2 doit intégrer TensorFlow.js avec COCO-SSD et documenter les dép
 | Tableaux | Aucune | Contrôle manuel |
 | Fenêtres | Aucune | Contrôle manuel |
 
-COCO-SSD est un modèle générique capable de produire d’autres classes. La restriction aux équipements, la non-exposition des personnes et les limites de cette restriction devront être vérifiées au milestone 2. Cadrez une salle vide. Ne jamais assimiler un objet non détecté à une absence certaine.
+COCO-SSD est un modèle générique : l’extraction de caractéristiques porte sur l’image entière. La restriction des classes ne garantit pas qu’une personne dans le champ n’influence pas les calculs internes. Aucun résultat, comptage, identité ou suivi de personne n’est produit. **Cadrez une salle vide.** Ne jamais assimiler un objet non détecté à une absence certaine.
 
-Source du modèle prévu : [TensorFlow.js COCO-SSD](https://github.com/tensorflow/tfjs-models/tree/master/coco-ssd).
+Source du modèle : [TensorFlow.js COCO-SSD](https://github.com/tensorflow/tfjs-models/tree/master/coco-ssd).
 
 ## Suivi et livraison
 

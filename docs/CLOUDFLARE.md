@@ -48,7 +48,7 @@ Ne jamais publier de token ou modifier un secret pour résoudre un simple probl�
 - Autoriser la webcam, vérifier le démarrage puis l’arrêt physique de la caméra.
 - Vérifier le comportement en cas de refus caméra.
 - Au milestone 1 : détection, seuil d’analyse et exports sont volontairement indisponibles.
-- Au milestone 2 : vérifier en plus le chargement du modèle et une inférence réelle. L’environnement de l’utilisateur devra accéder aux fichiers du modèle.
+- Au milestone 2 : vérifier en plus le chargement du modèle et une inférence réelle. Le navigateur de l’utilisateur devra accéder en HTTPS à `storage.googleapis.com` pour télécharger le graphe et ses poids. Aucune clé API n’est nécessaire et aucune image n’est envoyée. Une autorisation réseau dans l’environnement de développement n’est pas une configuration Cloudflare.
 
 Les déploiements des branches de travail peuvent servir de prévisualisations. Le dépôt privé ne rend pas automatiquement le site déployé privé : une restriction d’accès est un réglage d’hébergement distinct.
 

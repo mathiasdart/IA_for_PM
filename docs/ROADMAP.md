@@ -17,7 +17,7 @@ Objectif : application utilisable, prête à recevoir la détection.
 
 Validation : lancement local et build ; vues de 1440, 768 et 390 px ; import valide/invalide ; démarrage/arrêt/refus webcam ; configuration modifiable ; aucun résultat fictif. Contrôles automatisés avec médias synthétiques, complétés par une recette manuelle avec webcam physique.
 
-Passage : validation explicite du propriétaire de l’interface et du parcours avant M2.
+Passage autorisé par le propriétaire le 16 octobre 2026 après présentation des 4 tests unitaires et 10 tests navigateur réussis. Les limites de vérification sur webcam physique ont été rappelées ; la recette matérielle reste à confirmer.
 
 ## M2 — Détection réelle et audit
 
@@ -30,6 +30,8 @@ Objectif : observations réelles et conclusions interprétables.
 | [#7](https://github.com/mathiasdart/IA_for_PM/issues/7) | P0 | Jeu annoté, trois situations et parcours d’erreur |
 
 Validation : équipements visibles, occlusions/vue partielle et aucune détection exploitable ; cadres et compteurs cohérents ; seuil fonctionnel ; tests des calculs ; nouvelle tentative après échec de chargement. Les tests IA réels sont distingués des simulations.
+
+Implémentation et recette technique : voir [le modèle](MODEL.md) et [le protocole M2](VALIDATION-M2.md). L’évaluation de vision réelle reste distincte des parcours automatisés à prédictions synthétiques.
 
 Passage : validation explicite de la détection et des conclusions avant M3.
 
@@ -55,4 +57,5 @@ Le propriétaire a demandé à préparer Cloudflare dès M1 pour vérifier l’h
 - Ticket ouvert : à faire, en cours ou en recette, précisé dans sa description.
 - Un ticket est clôturé uniquement avec des preuves pour ses critères d’acceptation.
 - Une livraison technique ne vaut pas validation du milestone par le propriétaire.
-- Les milestones natifs restent à créer lorsque l’accès API GitHub le permet ; les sections ci-dessus ne les remplacent pas.
+- Milestones natifs créés le 16 octobre 2026 : [M1](https://github.com/mathiasdart/IA_for_PM/milestone/1), [M2](https://github.com/mathiasdart/IA_for_PM/milestone/2), [M3](https://github.com/mathiasdart/IA_for_PM/milestone/3). Tickets #1–#4 rattachés à M1, #5–#7 et PR #12 à M2, #8–#10 à M3. Ils restent ouverts tant que leurs travaux et validations ne sont pas terminés.
+- Recette initiale M2 réalisée sur les photos autorisées du propriétaire : 4 vrais positifs, 0 faux positif, 21 faux négatifs au seuil de 55 %. Rappel 16 % sur trois situations dérivées de deux prises de vue. Publication M2 demandée ; limites explicites et contrôle humain requis. M3 attend toujours la validation explicite du propriétaire.

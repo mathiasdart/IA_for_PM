@@ -1,4 +1,20 @@
-# Déployer avec Cloudflare Pages
+# Déployer sur Cloudflare
+
+## Projet existant : Workers Builds `ia-for-pm`
+
+Le contrôle GitHub du projet existant est **Workers Builds: ia-for-pm**. Le dépôt contient désormais `wrangler.jsonc` pour publier les fichiers statiques de `dist` avec ce Worker, sans API métier. Wrangler est fixé dans les dépendances de développement et le lockfile.
+
+| Paramètre | Valeur |
+| --- | --- |
+| Branche de production | `main` |
+| Build command | `npm run build` |
+| Deploy command | `npx wrangler deploy` |
+| Configuration | `wrangler.jsonc`, nom `ia-for-pm`, assets `./dist` |
+| Node | 22.12 minimum, branche 22 déclarée dans `.node-version` |
+
+Vérification locale sans publication : `npm run build` puis `npx wrangler deploy --dry-run`. Les identifiants Cloudflare de déploiement sont fournis par l’intégration Git existante ; aucun secret n’est ajouté au dépôt. Les résultats locaux ne prouvent pas le succès distant : vérifier le contrôle GitHub, l’URL HTTPS et l’analyse réelle après le déploiement de `main`.
+
+## Alternative : Cloudflare Pages
 
 Le dépôt doit contenir au moins un commit et une branche distante avant de connecter Pages. Un dépôt vide ne peut pas fournir de branche de production.
 
@@ -48,7 +64,7 @@ Ne jamais publier de token ou modifier un secret pour résoudre un simple probl�
 - Autoriser la webcam, vérifier le démarrage puis l’arrêt physique de la caméra.
 - Vérifier le comportement en cas de refus caméra.
 - Au milestone 1 : détection, seuil d’analyse et exports sont volontairement indisponibles.
-- Au milestone 2 : vérifier en plus le chargement du modèle et une inférence réelle. L’environnement de l’utilisateur devra accéder aux fichiers du modèle.
+- Au milestone 2 : vérifier en plus le chargement du modèle et une inférence réelle. Le navigateur de l’utilisateur devra accéder en HTTPS à `storage.googleapis.com` pour télécharger le graphe et ses poids. Aucune clé API n’est nécessaire et aucune image n’est envoyée. Une autorisation réseau dans l’environnement de développement n’est pas une configuration Cloudflare.
 
 Les déploiements des branches de travail peuvent servir de prévisualisations. Le dépôt privé ne rend pas automatiquement le site déployé privé : une restriction d’accès est un réglage d’hébergement distinct.
 

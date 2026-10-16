@@ -38,7 +38,7 @@ test('image valide affichée puis effacée sans persistance ni requête externe'
   await page.locator('#image-input').setInputFiles({ name: 'test.png', mimeType: 'image/png', buffer: pixel });
   await expect(page.locator('#source-badge')).toHaveText('Image prête');
   await expect(page.locator('#frame')).toBeVisible();
-  await expect(page.locator('#analyze')).toBeDisabled();
+  await expect(page.locator('#analyze')).toBeEnabled();
   await page.locator('#reset').click();
   await expect(page.locator('#frame')).toBeHidden();
   expect(await page.locator('#frame').evaluate((canvas) => canvas.width)).toBe(0);

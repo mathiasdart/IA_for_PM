@@ -1,0 +1,213 @@
+{
+  "at": "2026-10-16T13:56:15.068Z",
+  "kind": "real-photo-ui",
+  "sourceSha256": "006e46e823c20a263e7496b4d0ee459979c643a666aaf419f9bca44b9319ee58",
+  "browser": "154.0.8037.57",
+  "ui55": {
+    "total": 2,
+    "scores": "Chaises2Voir les scores de confiance#1 : 85 % · #2 : 80 %",
+    "frame": [
+      1920,
+      1440
+    ],
+    "overlay": [
+      1920,
+      1440
+    ],
+    "overlayVisible": true
+  },
+  "totalAt20": 16,
+  "totalAt95": 0,
+  "chairDifferenceWith16Expected": "-14",
+  "tableDifferenceWith6Expected": "-6",
+  "manualCategoriesVerified": true,
+  "sourceChangeClearsResults": true,
+  "externalRequests": [
+    {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/model.json"
+    },
+    {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard1of5"
+    },
+    {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard2of5"
+    },
+    {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard3of5"
+    },
+    {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard4of5"
+    },
+    {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard5of5"
+    }
+  ],
+  "rawPredictions": [
+    {
+      "class": "chair",
+      "score": 0.8458751440048218,
+      "bbox": [
+        997.9156494140625,
+        993.4297943115234,
+        298.55003356933594,
+        435.56997299194336
+      ]
+    },
+    {
+      "class": "chair",
+      "score": 0.8032737374305725,
+      "bbox": [
+        678.0990028381348,
+        948.1759071350098,
+        293.09743881225586,
+        427.2637939453125
+      ]
+    },
+    {
+      "class": "chair",
+      "score": 0.5217583775520325,
+      "bbox": [
+        737.0677757263184,
+        713.6206769943237,
+        263.88811111450195,
+        136.41727924346924
+      ]
+    },
+    {
+      "class": "chair",
+      "score": 0.508051872253418,
+      "bbox": [
+        391.04321479797363,
+        910.4800128936768,
+        311.51061058044434,
+        359.8542594909668
+      ]
+    },
+    {
+      "class": "dining table",
+      "score": 0.46039727330207825,
+      "bbox": [
+        348.43196868896484,
+        875.1804256439209,
+        1320.87890625,
+        366.05844497680664
+      ]
+    },
+    {
+      "class": "chair",
+      "score": 0.421611487865448,
+      "bbox": [
+        1319.5765686035156,
+        642.5132131576538,
+        147.41455078125,
+        156.6198492050171
+      ]
+    },
+    {
+      "class": "dining table",
+      "score": 0.35571444034576416,
+      "bbox": [
+        1467.3493194580078,
+        698.5040473937988,
+        425.4521942138672,
+        213.13528060913086
+      ]
+    },
+    {
+      "class": "chair",
+      "score": 0.3465806543827057,
+      "bbox": [
+        847.7859878540039,
+        728.7263202667236,
+        169.67639923095703,
+        114.19498443603516
+      ]
+    },
+    {
+      "class": "chair",
+      "score": 0.3363093435764313,
+      "bbox": [
+        1785.5926895141602,
+        779.6388530731201,
+        125.32058715820312,
+        159.9418830871582
+      ]
+    },
+    {
+      "class": "dining table",
+      "score": 0.3092022240161896,
+      "bbox": [
+        355.9357452392578,
+        833.0194473266602,
+        1259.8450469970703,
+        250.3231430053711
+      ]
+    },
+    {
+      "class": "chair",
+      "score": 0.2776103913784027,
+      "bbox": [
+        1679.1957092285156,
+        777.182207107544,
+        187.20199584960938,
+        167.0684051513672
+      ]
+    },
+    {
+      "class": "dining table",
+      "score": 0.2693580090999603,
+      "bbox": [
+        1428.5166549682617,
+        640.6685829162598,
+        480.4609680175781,
+        186.01930618286133
+      ]
+    },
+    {
+      "class": "chair",
+      "score": 0.24758340418338776,
+      "bbox": [
+        1651.3571548461914,
+        733.1841087341309,
+        230.5451202392578,
+        153.11885833740234
+      ]
+    },
+    {
+      "class": "chair",
+      "score": 0.24091944098472595,
+      "bbox": [
+        1353.2453155517578,
+        650.9362506866455,
+        205.09780883789062,
+        147.4203872680664
+      ]
+    },
+    {
+      "class": "chair",
+      "score": 0.2039807289838791,
+      "bbox": [
+        1591.6574478149414,
+        775.1942825317383,
+        152.72071838378906,
+        177.6266098022461
+      ]
+    },
+    {
+      "class": "chair",
+      "score": 0.2011885792016983,
+      "bbox": [
+        1486.710205078125,
+        720.8411407470703,
+        171.03721618652344,
+        154.94979858398438
+      ]
+    }
+  ]
+}

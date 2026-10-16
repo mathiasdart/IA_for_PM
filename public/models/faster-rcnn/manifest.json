@@ -5,7 +5,7 @@
   "format": "onnx",
   "opset": 17,
   "bytes": 175032490,
-  "sha256": "748b85212bc0f0a61095ae1a5a9897393445a93a52cd2b732c2ffdad75a43927",
+  "sha256": "afd75c22e21d27292c1bfd863849051c306fe8796bfa6bcbd4f8cdc0aa3ee7f3",
   "parts": [
     {
       "file": "model-00.bin",
@@ -20,37 +20,37 @@
     {
       "file": "model-02.bin",
       "bytes": 20971520,
-      "sha256": "3370ecab69584498a7cc0e41346a1edafc4413d05907a9e5612e075e3effa081"
+      "sha256": "6c64b3c27a800507ca7f02d1f40c53a0fc3312453f3edb14ae335e6f6d8b950e"
     },
     {
       "file": "model-03.bin",
       "bytes": 20971520,
-      "sha256": "a56ac044dedaed87437217fd455bdebca4c91e3334be83647b9b11fa8fe64e43"
+      "sha256": "a221c3df26478d5e0485a2bc6d65150a0ffcba0c8a5e13885f3c8ead37300e71"
     },
     {
       "file": "model-04.bin",
       "bytes": 20971520,
-      "sha256": "b8e69d3e36082c772b9f152540c3f6c30179279ddf6b275ebb106583fc5ff848"
+      "sha256": "dbcde8d1e3343679d9355072b7941aeee93f86531472aff4b9f9f7c82277a0c0"
     },
     {
       "file": "model-05.bin",
       "bytes": 20971520,
-      "sha256": "6d61f4eeef459684bb1216a713cb4a505d4ff7fb250200446b8d666b23f1df86"
+      "sha256": "3323f5d3e143f7a02640ebfd5a09294ef987fc81b0343ed7248f2927f49fc40f"
     },
     {
       "file": "model-06.bin",
       "bytes": 20971520,
-      "sha256": "1738b1b337c6fabf74c50250998fced26a5610383df78f47a1b5cf5976480538"
+      "sha256": "468c034f8fce3456849c75dcb0423d6569d77447e47ab5fad2cc45aa35f8db7e"
     },
     {
       "file": "model-07.bin",
       "bytes": 20971520,
-      "sha256": "8d8a814d172a3dbf21c31a227cfc4b4eedea311fb38aa3b7724e2fb82c7ba4a9"
+      "sha256": "398dfdfffa9e0d05014fee596f97d5c4b9a4632e570059e824e88118fdfeafcc"
     },
     {
       "file": "model-08.bin",
       "bytes": 7260330,
-      "sha256": "360010cc8f7b00141b4a80dd40a731d6199bf0a71b7f0a8a71b0ab11d96d1bc4"
+      "sha256": "806e403c0b68ec0665b3055b354ae4946799fb6cc001e6b9aaddb62d1ec93f21"
     }
   ],
   "input": "float32 RGB CHW in [0,1]; normalization and resizing are in the graph",

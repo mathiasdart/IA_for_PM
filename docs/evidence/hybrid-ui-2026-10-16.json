@@ -1,10 +1,10 @@
 {
-  "at": "2026-10-16T15:12:50.582Z",
+  "at": "2026-10-16T15:42:36.327Z",
   "kind": "real-compiled-hybrid-ui",
   "browser": "154.0.8037.57",
   "total55": 26,
   "total95": 9,
-  "durationMs": 54056,
+  "durationMs": 47458,
   "laptopObserved": "1",
   "standaloneScreensObserved": "0",
   "sourceChangeClearsAudit": true,
@@ -29,7 +29,7 @@
     },
     {
       "method": "GET",
-      "url": "blob:http://127.0.0.1:5175/404dbfc0-bd63-46ed-aa9e-8002b31adc24"
+      "url": "blob:http://127.0.0.1:5175/b47be07c-b442-4343-8030-7c2bbe55ea3e"
     },
     {
       "method": "GET",
@@ -113,11 +113,11 @@
     },
     {
       "method": "GET",
-      "url": "blob:http://127.0.0.1:5175/9d13421a-80b1-407a-b424-320f49b19f97"
+      "url": "blob:http://127.0.0.1:5175/e4ab8a45-013e-499f-8218-1d48407f3f85"
     },
     {
       "method": "GET",
-      "url": "blob:http://127.0.0.1:5175/5b989e7e-8e87-4bc8-847a-0915b965fa4a"
+      "url": "blob:http://127.0.0.1:5175/72726744-290c-4d92-9af7-21013f74d832"
     }
   ],
   "imageUploadObserved": false

@@ -9,6 +9,8 @@ try {
   browser = await launchVisionBrowser();
   const page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
   page.setDefaultTimeout(240_000);
+  page.on('requestfailed', (request) => console.log('requestfailed', request.url(), request.failure()));
+  page.on('console', (message) => { if (message.type() === 'error') console.log('console', message.text()); });
   const requests = [];
   page.on('request', (request) => requests.push({ method: request.method(), url: request.url() }));
   await page.goto('http://127.0.0.1:5175');
@@ -21,7 +23,7 @@ try {
   const total55 = Number(await page.locator('#metric-total').textContent());
   const measured = JSON.parse(await readFile('docs/evidence/faster-browser-2026-10-16.json'));
   const expected = measured.cases.find((item) => item.id === 'equipements-visibles').ensemble.filter((p) => p.score >= .55).length;
-  assert.equal(total55, expected);
+  assert.equal(total55, expected, await page.locator('#notification').textContent());
   assert(await page.locator('#overlay').isVisible());
   assert.match(await page.locator('#analysis-meta').textContent(), /COCO-SSD détaillé \+ Faster R-CNN/);
   assert.match(await page.locator('#detections').textContent(), /Faster R-CNN/);

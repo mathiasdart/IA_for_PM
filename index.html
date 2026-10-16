@@ -82,7 +82,7 @@
             </div>
             <input id="image-input" type="file" accept="image/jpeg,image/png,image/webp" hidden />
             <div class="capture-actions"><button id="analyze" class="button button-primary" type="button" disabled aria-describedby="analysis-availability"><span data-icon="scan"></span><span id="analyze-label">Analyser l’image</span></button><button id="start-camera" class="button button-secondary" type="button" hidden><span data-icon="camera"></span>Démarrer la caméra</button><button id="stop-camera" class="button button-secondary" type="button" hidden><span data-icon="stop"></span>Arrêter</button><button id="change-image" class="text-button" type="button" hidden>Changer d’image</button></div>
-            <p id="analysis-availability" class="availability-note">La préparation de la salle est disponible. La détection sera activée à la prochaine étape.</p>
+            <p id="analysis-availability" class="availability-note">Analyse ponctuelle : cadrez uniquement les équipements d’une salle vide.</p>
             <div class="confidence-control"><div><label for="confidence">Seuil de confiance</label><span id="confidence-value">55 %</span></div><input id="confidence" type="range" min="20" max="95" step="5" value="55" /><p>Les détections sous ce seuil sont écartées. Un score élevé ne garantit pas une détection correcte.</p></div>
           </article>
 
@@ -91,7 +91,8 @@
             <div id="audit-status" class="audit-status"><span id="audit-status-icon" data-icon="clock"></span><div><strong id="audit-status-title">Prêt quand vous l’êtes</strong><p id="audit-status-description">Ajoutez une image ou démarrez la caméra pour lancer votre premier audit.</p></div></div>
             <div class="results-heading"><h3>Équipements observés</h3><span id="detection-count" class="count-label">0 catégorie</span></div>
             <div id="detections" class="detections"><div class="results-empty"><span data-icon="layers"></span><p>Les résultats de votre analyse<br>apparaîtront ici.</p></div></div>
-            <div class="model-state"><span id="model-dot" class="status-dot"></span><div><strong id="model-label">Détection en préparation</strong><small id="model-detail">COCO-SSD · 4 catégories prévues · Aucun modèle chargé</small></div><button id="retry-model" class="text-button" type="button" hidden>Réessayer</button></div>
+            <p id="analysis-meta" class="analysis-meta" hidden></p>
+            <div class="model-state"><span id="model-dot" class="status-dot"></span><div><strong id="model-label">Modèle chargé à la première analyse</strong><small id="model-detail">COCO-SSD · 4 catégories ciblées · Aucun envoi d’image</small></div><button id="retry-model" class="text-button" type="button" hidden>Réessayer</button></div>
             <div class="note note-amber"><span data-icon="info"></span><p><strong>Non détecté ≠ absent.</strong> Un équipement peut être masqué, hors champ ou mal reconnu. Cet audit accompagne la vérification sur place.</p></div>
           </article>
         </section>
@@ -110,7 +111,7 @@
         <section id="methode" class="method-section">
           <div class="method-title"><p class="eyebrow">UNE IA QUI CONNAÎT SES LIMITES</p><h2>Une aide au contrôle,<br>avec les réserves nécessaires.</h2><p>L’audit porte sur une seule vue. Il ne constitue pas un inventaire complet de la salle.</p></div>
           <div class="method-card"><span data-icon="eye"></span><h3>Ce qui est visible</h3><p>Chaises, tables via « dining table », portables et écrans via « tv ». Les tableaux et fenêtres ne sont pas pris en charge.</p></div>
-          <div class="method-card"><span data-icon="shield"></span><h3>Le mobilier, uniquement</h3><p>Cadrez une salle vide. Aucune fonction de reconnaissance, de suivi ou de comptage des personnes. Aucun envoi d’image.</p></div>
+          <div class="method-card"><span data-icon="shield"></span><h3>Le mobilier, uniquement</h3><p>Cadrez une salle vide. Le modèle générique traite l’image entière ; seules les classes d’équipements sont exploitées. Aucun résultat sur les personnes, aucun envoi d’image.</p></div>
           <div class="method-card"><span data-icon="check"></span><h3>Le dernier mot reste humain</h3><p>Vérifiez les angles morts et les erreurs possibles. Les écarts signalent des points de contrôle, jamais une absence certaine.</p></div>
         </section>
         <footer class="footer"><span><strong>EPITA</strong> Smart Classroom</span><span>Des observations claires. Des décisions éclairées.</span><a href="https://github.com/mathiasdart/IA_for_PM" target="_blank" rel="noopener noreferrer">Code source <span aria-hidden="true">↗</span></a></footer>

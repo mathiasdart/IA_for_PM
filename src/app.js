@@ -1,9 +1,13 @@
 import './style.css';
 import { EQUIPMENT, exampleConfiguration, parseQuantity, validateImageFile, cameraErrorMessage } from './configuration.js';
 import { hydrateIcons, icon } from './icons.js';
+import { buildAudit } from './audit.js';
 
 const $ = (id) => document.getElementById(id);
-const state = { mode: 'image', stream: null, source: null, sourceVersion: 0, expected: exampleConfiguration() };
+const state = {
+  mode: 'image', stream: null, source: null, sourceVersion: 0, expected: exampleConfiguration(),
+  analysis: null, busy: false, activeVersion: null, modelState: 'idle', modelProgress: 0,
+};
 const video = $('camera');
 const frame = $('frame');
 const MAX_IMAGE_PIXELS = 40_000_000;
@@ -18,6 +22,7 @@ function notify(message, kind = 'info') {
 
 function configurationChanged() {
   $('configuration-badge').textContent = 'Configuration personnalisée';
+  renderAudit();
 }
 
 function renderConfiguration() {
@@ -25,6 +30,7 @@ function renderConfiguration() {
   body.replaceChildren();
   for (const item of EQUIPMENT) {
     const row = document.createElement('tr');
+    row.dataset.equipment = item.id;
     const description = document.createElement('td');
     // Labels and icons come only from the static equipment catalog.
     description.innerHTML = `<div class="equipment-cell"><span class="equipment-icon">${icon(item.icon)}</span><div><strong>${item.label}</strong><small>${item.detail}</small></div></div>`;
@@ -45,14 +51,17 @@ function renderConfiguration() {
       input.value = String(state.expected[item.id]);
       input.setCustomValidity('');
       input.setAttribute('aria-invalid', 'false');
+      renderAudit();
       notify('Quantité invalide : saisissez un entier de 0 à 999. La dernière valeur valide a été conservée.', 'error');
     });
     quantityCell.append(input);
     const observedCell = document.createElement('td');
-    observedCell.className = 'unobserved';
+    observedCell.className = 'unobserved observed-value';
     observedCell.textContent = '—';
     const differenceCell = observedCell.cloneNode(true);
+    differenceCell.className = 'unobserved difference-value';
     const verificationCell = document.createElement('td');
+    verificationCell.className = 'verification-value';
     const status = document.createElement('span');
     status.className = `badge ${item.support === 'manual' ? 'badge-manual' : 'badge-neutral'}`;
     status.textContent = item.support === 'manual' ? 'Contrôle manuel' : 'En attente d’analyse';
@@ -71,18 +80,20 @@ function stopTracks() {
 
 function clearSource() {
   state.sourceVersion += 1;
+  state.analysis = null;
   stopTracks();
   state.source = null;
   frame.width = frame.height = 0;
   $('overlay').width = $('overlay').height = 0;
   $('overlay').hidden = true;
   $('image-input').value = '';
+  renderAudit();
 }
 
 function renderSource() {
   const isCamera = state.mode === 'camera';
   const live = Boolean(state.stream);
-  const imageReady = state.source === 'image';
+  const imageReady = state.source === 'image' || state.source === 'capture';
   $('tab-image').classList.toggle('selected', !isCamera);
   $('tab-camera').classList.toggle('selected', isCamera);
   $('tab-image').setAttribute('aria-pressed', String(!isCamera));
@@ -95,18 +106,179 @@ function renderSource() {
   $('start-camera').hidden = !isCamera || live;
   $('start-camera').disabled = false;
   $('stop-camera').hidden = !live;
-  $('change-image').hidden = !imageReady;
+  $('change-image').hidden = !imageReady || isCamera;
   $('analyze-label').textContent = isCamera ? 'Analyser la vue' : 'Analyser l’image';
   $('capture-title').textContent = isCamera ? 'Un regard sur vos équipements.' : 'Votre salle, sous un nouvel angle.';
   $('capture-description').textContent = isCamera
     ? 'Démarrez la caméra et cadrez le mobilier d’une salle vide. Vous gardez le contrôle de la source.'
     : 'Importez une photo du mobilier et des équipements. Choisissez une vue dégagée, sans personne.';
-  $('source-badge').textContent = live ? 'Caméra active' : imageReady ? 'Image prête' : 'Aucune source';
+  $('source-badge').textContent = live ? 'Caméra active' : state.source === 'capture' ? 'Capture figée' : imageReady ? 'Image prête' : 'Aucune source';
   $('source-badge').className = `badge ${live || imageReady ? 'badge-success' : 'badge-neutral'}`;
-  $('audit-status-title').textContent = live || imageReady ? 'Source prête pour l’audit' : 'Prêt quand vous l’êtes';
-  $('audit-status-description').textContent = live || imageReady
-    ? 'Vérifiez votre cadrage et la configuration attendue. La détection sera activée à la prochaine étape.'
-    : 'Ajoutez une image ou démarrez la caméra pour préparer votre audit.';
+  renderAudit();
+}
+
+function invalidConfiguration() {
+  return Boolean(document.querySelector('.quantity-input[aria-invalid="true"]'));
+}
+
+function renderModel() {
+  const loading = state.modelState === 'loading';
+  const labels = {
+    idle: 'Modèle chargé à la première analyse', loading: `Chargement du modèle · ${Math.round(state.modelProgress * 100)} %`,
+    ready: 'Modèle prêt · traitement dans le navigateur', error: 'Le modèle n’a pas pu être chargé',
+  };
+  $('model-label').textContent = labels[state.modelState];
+  $('model-detail').textContent = state.modelState === 'error'
+    ? 'Vérifiez votre connexion et l’accès à storage.googleapis.com.'
+    : 'COCO-SSD · 4 catégories ciblées · Aucun envoi d’image';
+  $('model-dot').className = `status-dot ${state.modelState}`;
+  $('retry-model').hidden = state.modelState !== 'error' || !state.source;
+  $('retry-model').disabled = state.busy;
+  $('analyzing-message').textContent = loading ? 'Préparation du modèle de détection…' : 'Analyse des équipements…';
+}
+
+function drawDetections(predictions) {
+  const canvas = $('overlay');
+  canvas.width = frame.width;
+  canvas.height = frame.height;
+  canvas.hidden = !predictions.length || !frame.width;
+  if (canvas.hidden) return;
+  const context = canvas.getContext('2d');
+  const factor = Math.max(1, frame.width / 800);
+  context.lineWidth = 2 * factor;
+  context.font = `600 ${13 * factor}px system-ui, sans-serif`;
+  for (const prediction of predictions) {
+    const item = EQUIPMENT.find((category) => category.modelClass === prediction.class);
+    const [x, y, width, height] = prediction.bbox;
+    const label = `${item.label} · ${Math.round(prediction.score * 100)} %`;
+    const labelWidth = Math.min(frame.width, context.measureText(label).width + 14 * factor);
+    const labelX = Math.min(x, Math.max(0, frame.width - labelWidth));
+    const labelY = Math.max(0, y - 23 * factor);
+    context.strokeStyle = '#d5ed93';
+    context.strokeRect(x, y, width, height);
+    context.fillStyle = '#174c43';
+    context.fillRect(labelX, labelY, labelWidth, 23 * factor);
+    context.fillStyle = '#ffffff';
+    context.fillText(label, labelX + 6 * factor, labelY + 16 * factor);
+  }
+}
+
+function renderAudit() {
+  const invalid = invalidConfiguration();
+  const audit = invalid ? null : buildAudit(state.analysis, state.expected, Number($('confidence').value) / 100);
+  const activeBusy = state.busy && state.activeVersion === state.sourceVersion;
+  const ready = Boolean(state.source);
+  $('analyze').disabled = !ready || state.busy || invalid;
+  $('confidence').disabled = !state.analysis || state.busy;
+  $('viewfinder').setAttribute('aria-busy', String(activeBusy));
+  $('analyzing-overlay').hidden = !activeBusy;
+  $('analyze-label').textContent = state.busy ? 'Analyse en cours…' : state.mode === 'camera' && state.stream ? 'Analyser la vue' : 'Analyser l’image';
+  $('analysis-availability').textContent = invalid ? 'Corrigez les quantités attendues avant de comparer les résultats.'
+    : state.source === 'capture' ? 'Capture figée pour cet audit. Redémarrez la caméra pour analyser une nouvelle vue.'
+      : 'Analyse ponctuelle : cadrez uniquement les équipements d’une salle vide.';
+  $('metric-total').textContent = audit ? String(audit.total) : '—';
+  $('metric-categories').textContent = audit ? String(audit.categories) : '—';
+  $('metric-rules').textContent = audit ? String(audit.verifiableRules) : '—';
+  $('metric-gaps').textContent = audit ? String(audit.gaps) : '—';
+  $('metric-total-note').textContent = audit ? `Au seuil de ${Math.round(audit.threshold * 100)} % sur cette vue` : 'En attente d’une analyse';
+  $('metric-rules-note').textContent = audit ? `${audit.manualCategories} catégories à contrôler manuellement` : 'Selon les capacités du modèle';
+  $('metric-gaps-note').textContent = audit ? 'Catégories présentant un écart' : 'À confirmer sur place';
+  $('detection-count').textContent = `${audit?.categories ?? 0} catégorie${(audit?.categories ?? 0) > 1 ? 's' : ''}`;
+  for (const row of document.querySelectorAll('#configuration-rows tr')) {
+    const observation = audit?.rows.find((item) => item.id === row.dataset.equipment);
+    const item = EQUIPMENT.find((category) => category.id === row.dataset.equipment);
+    row.querySelector('.observed-value').textContent = observation?.observed ?? '—';
+    const difference = observation?.difference;
+    row.querySelector('.difference-value').textContent = difference == null ? '—' : difference > 0 ? `+${difference}` : String(difference);
+    const badge = row.querySelector('.verification-value .badge');
+    badge.className = `badge ${item.support === 'manual' ? 'badge-manual' : observation?.difference ? 'badge-warning' : observation ? 'badge-success' : 'badge-neutral'}`;
+    const labels = { manual: 'Contrôle manuel', 'not-seen': 'À vérifier · non vus', excess: 'À vérifier · surplus', matching: 'Aucun écart visible' };
+    badge.textContent = observation ? labels[observation.status] : item.support === 'manual' ? 'Contrôle manuel' : 'En attente d’analyse';
+  }
+  if (!audit) {
+    $('audit-status-title').textContent = invalid ? 'Configuration à corriger' : ready ? 'Source prête pour l’audit' : 'Prêt quand vous l’êtes';
+    $('audit-status-description').textContent = invalid ? 'Saisissez des quantités entières entre 0 et 999.' : ready
+      ? 'Vérifiez le cadrage et les quantités attendues, puis lancez l’analyse.' : 'Ajoutez une image ou démarrez la caméra pour préparer votre audit.';
+    $('detections').innerHTML = `<div class="results-empty"><span>${icon('layers')}</span><p>Les résultats de votre analyse<br>apparaîtront ici.</p></div>`;
+    $('analysis-meta').hidden = true;
+  } else {
+    const titles = { 'no-detection': 'Aucun équipement reconnu sur cette vue', review: 'Vérification complémentaire requise', 'partial-match': 'Aucun écart sur les catégories vérifiables' };
+    $('audit-status-title').textContent = titles[audit.status];
+    $('audit-status-description').textContent = audit.status === 'no-detection'
+      ? 'Cela ne prouve aucune absence. Essayez un autre cadrage ou un seuil plus bas, puis contrôlez sur place.'
+      : `${audit.gaps} catégorie${audit.gaps > 1 ? 's' : ''} avec un écart observé. Tableaux et fenêtres nécessitent un contrôle manuel. L’inventaire de la salle reste partiel.`;
+    $('detections').replaceChildren();
+    if (!audit.predictions.length) {
+      $('detections').innerHTML = `<div class="results-empty"><span>${icon('eye')}</span><p>Aucune prédiction retenue à ce seuil.<br>Vérifiez le cadrage et les équipements sur place.</p></div>`;
+    }
+    for (const item of EQUIPMENT.filter((category) => audit.counts[category.id] > 0)) {
+      const group = document.createElement('div');
+      group.className = 'detection-group';
+      const categoryPredictions = audit.predictions.filter((prediction) => prediction.class === item.modelClass);
+      group.innerHTML = `<div class="detection-group-heading"><span class="equipment-icon">${icon(item.icon)}</span><strong>${item.label}</strong><span class="detection-quantity">${categoryPredictions.length}</span></div>`;
+      const details = document.createElement('details');
+      const summary = document.createElement('summary');
+      summary.textContent = 'Voir les scores de confiance';
+      details.append(summary);
+      const scores = document.createElement('p');
+      scores.textContent = categoryPredictions.map((prediction, index) => `#${index + 1} : ${Math.round(prediction.score * 100)} %`).join(' · ');
+      details.append(scores);
+      group.append(details);
+      $('detections').append(group);
+    }
+    const date = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date(state.analysis.at));
+    $('analysis-meta').textContent = `${state.analysis.source === 'camera' ? 'Capture webcam' : 'Image importée'} · ${date} · Analyse ${state.analysis.durationMs / 1000} s, dont inférence ${state.analysis.inferenceMs / 1000} s. Résultats limités à cette vue.${audit.truncated ? ' Limite de 100 détections atteinte : comptage potentiellement incomplet.' : ''}`;
+    $('analysis-meta').hidden = false;
+  }
+  drawDetections(audit?.predictions ?? []);
+  renderModel();
+}
+
+async function analyze() {
+  if (!state.source || state.busy || invalidConfiguration()) return;
+  const version = state.sourceVersion;
+  const source = state.source === 'camera' || state.source === 'capture' ? 'camera' : 'image';
+  const started = performance.now();
+  const capturedAt = new Date().toISOString();
+  if (state.stream) {
+    if (!video.videoWidth || !video.videoHeight) { notify('La caméra n’est pas encore prête. Réessayez dans un instant.', 'error'); return; }
+    frame.width = video.videoWidth;
+    frame.height = video.videoHeight;
+    frame.getContext('2d').drawImage(video, 0, 0);
+    stopTracks();
+    state.source = 'capture';
+  }
+  // Separate pixels prevent a source reset from altering an ongoing inference.
+  const snapshot = document.createElement('canvas');
+  snapshot.width = frame.width; snapshot.height = frame.height;
+  snapshot.getContext('2d').drawImage(frame, 0, 0);
+  state.busy = true;
+  state.activeVersion = version;
+  state.analysis = null;
+  renderSource();
+  let loaded = false;
+  try {
+    if (state.modelState !== 'ready') { state.modelState = 'loading'; state.modelProgress = 0; renderModel(); }
+    const { getDetector } = await import('./detector.js');
+    const detector = await getDetector(({ progress }) => { state.modelProgress = progress; renderModel(); });
+    loaded = true;
+    state.modelState = 'ready';
+    renderModel();
+    if (version !== state.sourceVersion) return;
+    const result = await detector.detect(snapshot);
+    if (version !== state.sourceVersion) return;
+    state.analysis = { ...result, source, at: capturedAt, durationMs: Math.round(performance.now() - started) };
+    notify('Analyse terminée. Les écarts concernent uniquement cette vue et demandent une vérification sur place.');
+  } catch {
+    state.modelState = loaded ? 'ready' : 'error';
+    if (version === state.sourceVersion) notify(loaded
+      ? 'L’analyse a échoué. Réessayez avec une image plus petite ou un autre navigateur.'
+      : 'Impossible de charger le modèle. Vérifiez votre connexion, puis réessayez. Aucune détection n’a été produite.', 'error');
+  } finally {
+    snapshot.width = snapshot.height = 0;
+    state.busy = false;
+    renderSource();
+  }
 }
 
 function switchSource(mode) {
@@ -222,15 +394,20 @@ $('reset-config').addEventListener('click', () => {
   state.expected = exampleConfiguration();
   $('configuration-badge').textContent = 'Configuration d’exemple';
   renderConfiguration();
+  renderAudit();
   notify('Quantités d’exemple rétablies. Adaptez-les à votre salle avant un audit.');
 });
 $('room-name').addEventListener('input', configurationChanged);
 $('room-name').addEventListener('blur', (event) => {
   if (!event.target.value.trim()) event.target.value = 'Salle sans nom';
 });
-$('confidence').disabled = true;
-$('confidence').setAttribute('aria-describedby', 'analysis-availability');
-$('report-hint').textContent = 'Le rapport sera disponible après l’activation de la détection.';
+$('analyze').addEventListener('click', () => { void analyze(); });
+$('retry-model').addEventListener('click', () => { void analyze(); });
+$('confidence').addEventListener('input', () => {
+  $('confidence-value').textContent = `${$('confidence').value} %`;
+  renderAudit();
+});
+$('report-hint').textContent = 'Consultation et export du rapport prévus à la prochaine étape.';
 
 const navLinks = [...document.querySelectorAll('.nav-link')];
 navLinks.forEach((link) => link.addEventListener('click', () => {

@@ -12,7 +12,7 @@ Application B2B d’aide au contrôle visuel des équipements d’une salle. Le 
 - Arrêt de la caméra lors d’un changement de source ou lorsque la page devient masquée.
 - Nom de salle et configuration de six catégories, quantités entières de 0 à 999.
 - Les valeurs d’exemple sont signalées et peuvent être rétablies.
-- Détection COCO-SSD chargée à la demande, cadres et scores individuels ; seuil entre 20 et 95 %.
+- COCO-SSD rapide ou détaillé ; mode combiné facultatif avec Faster R-CNN, entièrement dans le navigateur. Cadres et scores individuels ; seuil entre 20 et 95 %.
 - Audit d’une image figée : une capture webcam arrête le flux ; un changement de source invalide les résultats.
 - Comptages, écarts par catégorie et statut partiel recalculés selon le seuil et le référentiel.
 - Échec du téléchargement expliqué avec nouvelle tentative. Un objet non détecté n’est jamais déclaré absent.
@@ -54,11 +54,11 @@ Ces tests vérifient le parcours avec des médias synthétiques et des autorisat
 
 Pour l’évaluation réelle, voir [le protocole M2 et l’outil de mesure](docs/VALIDATION-M2.md). Les tests simulés et les mesures de vision sont comptabilisés séparément.
 
-Le vrai graphe COCO-SSD et ses poids ont désormais été téléchargés et exécutés sur la fixture synthétique existante (`npm run verify:vision-runtime`). Cela confirme le runtime et le parcours réseau, sans mesure de précision/rappel sur photographies. La recette sur les deux photos autorisées du propriétaire est réalisée : trois situations dont deux recadrages, 4 objets appariés sur 25 annotés au seuil de 55 % (rappel 16 %), aucun faux positif sur quatre prédictions. Ce petit jeu confirme une forte sous-détection : contrôle humain indispensable, aucun inventaire exhaustif. Les preuves sans image sont publiées dans le protocole M2 ; M3 attend la validation explicite du propriétaire.
+La recette initiale M2 est conservée dans le protocole. Les améliorations suivantes ont été évaluées sur quatre photos autorisées et cinq cas dont des recadrages : au seuil de 55 %, COCO détaillé repère 10 objets sur 27 annotations, contre 6 en rapide. Le mode combiné COCO + Faster R-CNN atteint 21 objets correctement appariés, avec 11 faux positifs : il reste expérimental. Ces données servent au développement et ne constituent pas une validation indépendante. Voir [les mesures, performances et limites](docs/DETECTION-QUALITY.md). Les tableaux restent manuels ; M3 attend toujours la validation explicite du propriétaire.
 
 ## Architecture
 
-Frontend statique HTML, CSS et JavaScript ES modules, assemblé par Vite. Aucune API métier ni base de données. TensorFlow.js 4.22.0 est une dépendance runtime versionnée, compilée dans un module chargé à la demande. Les poids du modèle sont téléchargés depuis Google Cloud Storage ; aucune image n’est envoyée à ce service.
+Frontend statique HTML, CSS et JavaScript ES modules, assemblé par Vite. Aucune API d’analyse ni base de données. Faster R-CNN utilise ONNX Runtime Web 1.23.2 dans un worker WebAssembly, à la demande. Ses poids (environ 175 Mo) sont servis avec les fichiers statiques ; aucune photo n’est envoyée. TensorFlow.js 4.22.0 est une dépendance runtime versionnée, compilée dans un module chargé à la demande. Les poids du modèle sont téléchargés depuis Google Cloud Storage ; aucune image n’est envoyée à ce service.
 
 ```text
 index.html                    Structure et parcours
@@ -78,9 +78,9 @@ scripts/                      Évaluation de vision sur annotations
 
 ## Décision IA
 
-Décision validée le 16 octobre 2026 : **COCO-SSD préentraîné pour le MVP, amélioration métier ensuite**. Nous ne réentraînons pas les poids dans ce MVP. Évaluer des images annotées et régler un seuil de confiance ne constitue pas un entraînement.
+Décision mise à jour le 16 octobre 2026 : **COCO-SSD préentraîné, avec Faster R-CNN COCO préentraîné en mode combiné facultatif**, à la demande du propriétaire. Nous ne réentraînons pas les poids dans ce MVP. Évaluer des images annotées et régler un seuil de confiance ne constitue pas un entraînement.
 
-Le moteur charge le graphe **SSDLite MobileNet v2** utilisé par COCO-SSD. Il lit uniquement les quatre colonnes de scores d’équipements, choisit la meilleure classe autorisée par boîte puis applique une suppression des doublons par catégorie (IoU > 0,5). Le plancher de calcul est 20 % et la limite 100 détections par image, explicitement signalée si atteinte. Ce post-traitement est décrit dans [la documentation du modèle](docs/MODEL.md) et doit être évalué sur notre jeu d’images.
+Le moteur COCO charge le graphe **SSDLite MobileNet v2** utilisé par COCO-SSD. Le mode détaillé ajoute quatre vues rapprochées ; le mode combiné fusionne ensuite les résultats avec Faster R-CNN. Voir [les détails](docs/DETECTION-QUALITY.md). Il lit uniquement les quatre colonnes de scores d’équipements, choisit la meilleure classe autorisée par boîte puis applique une suppression des doublons par catégorie (IoU > 0,5). Le plancher de calcul est 20 % et la limite 100 détections par image, explicitement signalée si atteinte. Ce post-traitement est décrit dans [la documentation du modèle](docs/MODEL.md) et doit être évalué sur notre jeu d’images.
 
 | Équipement | Classe COCO-SSD | Limite |
 | --- | --- | --- |

@@ -1,0 +1,76 @@
+{
+  "dataset": "Amorce tableaux — un seul tableau/salle, annotations préliminaires à relire",
+  "usage": "Préparation interne au projet autorisée par le propriétaire ; images hors Git.",
+  "cases": [
+    {
+      "id": "vue-paysage-tableau",
+      "file": "vue-paysage.jpg",
+      "sourceSha256": "006e46e823c20a263e7496b4d0ee459979c643a666aaf419f9bca44b9319ee58",
+      "split": "train",
+      "group": "session-salle-01",
+      "reviewed": false,
+      "expected": [
+        {
+          "class": "whiteboard",
+          "bbox": [
+            0.5275,
+            0.35333333333333333,
+            0.2,
+            0.145
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vue-portrait-tableau",
+      "file": "vue-portrait.jpg",
+      "sourceSha256": "0cacce16a9dea8c365b8ff5d04fea36bb7d5145dc42ec715d044cb66648a7e92",
+      "split": "train",
+      "group": "session-salle-01",
+      "reviewed": false,
+      "expected": [
+        {
+          "class": "whiteboard",
+          "bbox": [
+            0.33566666666666667,
+            0.3925,
+            0.2793333333333333,
+            0.1125
+          ]
+        }
+      ]
+    },
+    {
+      "id": "portable-ouvert-negatif-tableau",
+      "file": "portable-ouvert.jpg",
+      "originalName": "IMG_0697.jpg",
+      "sourceSha256": "7da255e1676058a18d1d1db27408930395160042170ddde33de66c35118e8ca7",
+      "crop": [
+        0.20833333333333334,
+        0.22569444444444445,
+        0.6944444444444444,
+        0.625
+      ],
+      "expected": [],
+      "reviewed": true,
+      "split": "train",
+      "group": "session-salle-01"
+    },
+    {
+      "id": "portable-ferme-negatif-tableau",
+      "file": "portable-ferme.jpg",
+      "originalName": "IMG_0698.jpg",
+      "sourceSha256": "6cacf932b1f06bebf3051d893984058dadf4f6fde9747a7fd92b764d4d99a6f4",
+      "crop": [
+        0,
+        0.3298611111111111,
+        1,
+        0.4513888888888889
+      ],
+      "expected": [],
+      "reviewed": true,
+      "split": "train",
+      "group": "session-salle-01"
+    }
+  ]
+}

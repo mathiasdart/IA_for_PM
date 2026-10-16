@@ -17,7 +17,7 @@ try {
  await page.locator('#confidence').fill('20');const at20=Number(await page.locator('#metric-total').textContent());assert.equal(at20,prediction.predictions.length);
  await page.locator('#confidence').fill('95');assert.equal(await page.locator('#metric-total').textContent(),'0');assert(await page.locator('#overlay').isHidden());assert.match(await page.locator('#audit-status-description').textContent(),/ne prouve aucune absence/);
  await page.locator('#confidence').fill('55');await page.locator('#expected-chair').fill('16');await page.locator('#expected-table').fill('6');
- const chair=await page.locator('[data-equipment="chair"] .difference-value').textContent();const table=await page.locator('[data-equipment="table"] .difference-value').textContent();assert.equal(chair,'-14');assert.equal(table,'-6');
+ const chair=await page.locator('[data-equipment="chair"] .difference-value').textContent();const table=await page.locator('[data-equipment="table"] .difference-value').textContent();assert.equal(Number(chair),retained.filter(p=>p.class==='chair').length-16);assert.equal(Number(table),retained.filter(p=>p.class==='dining table').length-6);
  for(const id of ['board','window'])assert.match(await page.locator(`[data-equipment="${id}"] .verification-value`).textContent(),/Contrôle manuel/);
  await page.screenshot({path:'.vision-data/recette-photo-ui.png',fullPage:true});
  await page.locator('#image-input').setInputFiles('.vision-data/vue-portrait.jpg');await page.locator('#source-badge').filter({hasText:'Image prête'}).waitFor();assert.equal(await page.locator('#metric-total').textContent(),'—');assert(await page.locator('#overlay').isHidden());

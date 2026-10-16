@@ -1,5 +1,9 @@
 # Recette du milestone 2
 
+## Version suivante : COCO détaillé et Faster R-CNN
+
+La recette initiale ci-dessous est conservée comme référence historique. Les améliorations demandées ensuite, leurs mesures réelles, le mode combiné expérimental et ses limites sont documentés dans [DETECTION-QUALITY.md](DETECTION-QUALITY.md). Les tableaux restent manuels et M3 attend la validation explicite du propriétaire.
+
 ## Distinguer les preuves
 
 Les tests unitaires valident les règles et les géométries. Les tests navigateur utilisent des médias et des prédictions synthétiques pour valider le parcours. Un petit graphe synthétique teste le vrai chargement et l’exécution TensorFlow ; il ne reconnaît aucun objet réel.

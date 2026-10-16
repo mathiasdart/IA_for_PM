@@ -8,3 +8,5 @@ playwright-report/
 .DS_Store
 .vision-data/
 .wrangler/
+public/models/faster-rcnn/*.bin
+__pycache__/

@@ -2,14 +2,17 @@ import './style.css';
 import { EQUIPMENT, exampleConfiguration, parseQuantity, validateImageFile, cameraErrorMessage } from './configuration.js';
 import { hydrateIcons, icon } from './icons.js';
 import { buildAudit } from './audit.js';
+import { mergeDetectors } from './detection-ensemble.js';
 
 const $ = (id) => document.getElementById(id);
 const state = {
   mode: 'image', stream: null, source: null, sourceVersion: 0, expected: exampleConfiguration(),
   analysis: null, busy: false, activeVersion: null, modelState: 'idle', modelProgress: 0,
+  analysisProgress: null,
 };
 const video = $('camera');
 const frame = $('frame');
+let activeFaster;
 const MAX_IMAGE_PIXELS = 40_000_000;
 
 hydrateIcons();
@@ -129,12 +132,16 @@ function renderModel() {
   };
   $('model-label').textContent = labels[state.modelState];
   $('model-detail').textContent = state.modelState === 'error'
-    ? 'Vérifiez votre connexion et l’accès à storage.googleapis.com.'
-    : 'COCO-SSD · 4 catégories ciblées · Aucun envoi d’image';
+    ? 'Vérifiez votre connexion ou essayez un mode COCO seul.'
+    : `${$('analysis-mode').value === 'hybrid' ? 'COCO-SSD + Faster R-CNN' : 'COCO-SSD'} · 4 catégories ciblées · Aucun envoi d’image`;
   $('model-dot').className = `status-dot ${state.modelState}`;
   $('retry-model').hidden = state.modelState !== 'error' || !state.source;
   $('retry-model').disabled = state.busy;
-  $('analyzing-message').textContent = loading ? 'Préparation du modèle de détection…' : 'Analyse des équipements…';
+  const progress = state.analysisProgress;
+  $('analyzing-message').textContent = loading ? 'Préparation du modèle de détection…'
+    : progress?.phase === 'faster' ? 'Faster R-CNN · analyse approfondie en cours…'
+      : progress?.total > 1 ? `Analyse détaillée · vue ${Math.min(progress.completed + 1, progress.total)} sur ${progress.total}`
+      : 'Analyse des équipements…';
 }
 
 function drawDetections(predictions) {
@@ -170,6 +177,7 @@ function renderAudit() {
   const ready = Boolean(state.source);
   $('analyze').disabled = !ready || state.busy || invalid;
   $('confidence').disabled = !state.analysis || state.busy;
+  $('analysis-mode').disabled = state.busy;
   $('viewfinder').setAttribute('aria-busy', String(activeBusy));
   $('analyzing-overlay').hidden = !activeBusy;
   $('analyze-label').textContent = state.busy ? 'Analyse en cours…' : state.mode === 'camera' && state.stream ? 'Analyser la vue' : 'Analyser l’image';
@@ -221,13 +229,15 @@ function renderAudit() {
       summary.textContent = 'Voir les scores de confiance';
       details.append(summary);
       const scores = document.createElement('p');
-      scores.textContent = categoryPredictions.map((prediction, index) => `#${index + 1} : ${Math.round(prediction.score * 100)} %`).join(' · ');
+      scores.textContent = categoryPredictions.map((prediction, index) => `#${index + 1} : ${Math.round(prediction.score * 100)} %${prediction.model ? ` (${prediction.model === 'faster-rcnn' ? 'Faster R-CNN' : 'COCO-SSD'})` : ''}`).join(' · ');
       details.append(scores);
       group.append(details);
       $('detections').append(group);
     }
     const date = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date(state.analysis.at));
-    $('analysis-meta').textContent = `${state.analysis.source === 'camera' ? 'Capture webcam' : 'Image importée'} · ${date} · Analyse ${state.analysis.durationMs / 1000} s, dont inférence ${state.analysis.inferenceMs / 1000} s. Résultats limités à cette vue.${audit.truncated ? ' Limite de 100 détections atteinte : comptage potentiellement incomplet.' : ''}`;
+    const method = state.analysis.engines?.includes('faster-rcnn') ? 'COCO-SSD détaillé + Faster R-CNN'
+      : state.analysis.regions > 1 ? 'Vue complète et 4 zones rapprochées' : 'Vue complète';
+    $('analysis-meta').textContent = `${state.analysis.source === 'camera' ? 'Capture webcam' : 'Image importée'} · ${date} · ${method} · Analyse ${state.analysis.durationMs / 1000} s, dont inférence ${state.analysis.inferenceMs / 1000} s. Résultats limités à cette vue.${audit.truncated ? ' Limite de 100 détections atteinte : comptage potentiellement incomplet.' : ''}`;
     $('analysis-meta').hidden = false;
   }
   drawDetections(audit?.predictions ?? []);
@@ -255,8 +265,10 @@ async function analyze() {
   state.busy = true;
   state.activeVersion = version;
   state.analysis = null;
+  state.analysisProgress = null;
   renderSource();
   let loaded = false;
+  const hybrid = $('analysis-mode').value === 'hybrid';
   try {
     if (state.modelState !== 'ready') { state.modelState = 'loading'; state.modelProgress = 0; renderModel(); }
     const { getDetector } = await import('./detector.js');
@@ -265,13 +277,34 @@ async function analyze() {
     state.modelState = 'ready';
     renderModel();
     if (version !== state.sourceVersion) return;
-    const result = await detector.detect(snapshot);
+    let result = await detector.detect(snapshot, {
+      detailed: $('analysis-mode').value !== 'quick',
+      onProgress: (progress) => {
+        if (version !== state.sourceVersion) return;
+        state.analysisProgress = progress; renderModel();
+      },
+    });
     if (version !== state.sourceVersion) return;
+    if (hybrid) {
+      state.modelState = 'loading'; state.modelProgress = 0; loaded = false; renderModel();
+      const { getFasterDetector } = await import('./faster-detector.js');
+      const faster = await getFasterDetector(({ progress }) => { state.modelProgress = progress; renderModel(); });
+      activeFaster = faster;
+      loaded = true; state.modelState = 'ready'; state.analysisProgress = { phase: 'faster' }; renderModel();
+      if (version !== state.sourceVersion) return;
+      const second = await faster.detect(snapshot);
+      if (version !== state.sourceVersion) return;
+      const merged = mergeDetectors(result.predictions, second.predictions);
+      result = { ...result, ...merged, truncated: result.truncated || second.truncated || merged.truncated,
+        inferenceMs: result.inferenceMs + second.inferenceMs, engines: ['coco-ssd', 'faster-rcnn'] };
+    }
     state.analysis = { ...result, source, at: capturedAt, durationMs: Math.round(performance.now() - started) };
     notify('Analyse terminée. Les écarts concernent uniquement cette vue et demandent une vérification sur place.');
   } catch {
     state.modelState = loaded ? 'ready' : 'error';
-    if (version === state.sourceVersion) notify(loaded
+    if (version === state.sourceVersion) notify(hybrid
+      ? 'Le mode combiné a échoué sur cet appareil. Réessayez ou choisissez un mode COCO seul. Aucun résultat combiné n’a été produit.'
+      : loaded
       ? 'L’analyse a échoué. Réessayez avec une image plus petite ou un autre navigateur.'
       : 'Impossible de charger le modèle. Vérifiez votre connexion, puis réessayez. Aucune détection n’a été produite.', 'error');
   } finally {
@@ -406,6 +439,14 @@ $('retry-model').addEventListener('click', () => { void analyze(); });
 $('confidence').addEventListener('input', () => {
   $('confidence-value').textContent = `${$('confidence').value} %`;
   renderAudit();
+});
+$('analysis-mode').addEventListener('change', () => {
+  if ($('analysis-mode').value !== 'hybrid') { activeFaster?.dispose(); activeFaster = undefined; }
+  state.sourceVersion += 1;
+  state.analysis = null;
+  state.analysisProgress = null;
+  renderAudit();
+  if (state.source) notify('Mode d’analyse modifié. Relancez l’analyse pour obtenir les résultats correspondants.');
 });
 $('report-hint').textContent = 'Consultation et export du rapport prévus à la prochaine étape.';
 

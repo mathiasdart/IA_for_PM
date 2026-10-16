@@ -467,7 +467,7 @@ const sectionObserver = new IntersectionObserver((entries) => {
     else link.removeAttribute('aria-current');
   });
 }, { rootMargin: '-10% 0px -50% 0px', threshold: [0, 0.2, 0.5] });
-['audit', 'configuration', 'rapport', 'methode'].forEach((id) => sectionObserver.observe($(id)));
+['audit', 'configuration', 'images', 'rapport', 'methode'].forEach((id) => sectionObserver.observe($(id)));
 
 window.addEventListener('pagehide', () => { clearSource(); renderSource(); });
 document.addEventListener('visibilitychange', () => {

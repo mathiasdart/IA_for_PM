@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-16T14:07:02.170997+00:00",
+  "provider": "Cloudflare Workers Builds",
+  "worker": "ia-for-pm",
+  "url": "https://ia-for-pm.mathiasdart89.workers.dev",
+  "gitCommit": "cbf3c6d73fc51bfbf42dc0aabbc9339d4d8c326f",
+  "cloudflareVersion": "e2c8f4d7-2c65-4f68-a25c-71bcbc784b04",
+  "evidenceSource": "Journal du déploiement fourni par le propriétaire dans cette conversation",
+  "buildStartedAt": "2026-10-16T14:03:27.739Z",
+  "buildCompletedAt": "2026-10-16T14:04:10.977Z",
+  "buildResult": "success",
+  "deployResult": "success",
+  "node": "22.23.3",
+  "wrangler": "4.151.1",
+  "uploadedAssets": [
+    "/index.html",
+    "/assets/detector-DbS3Ohzp.js",
+    "/assets/index-Cn1U7ZxW.css",
+    "/assets/index-CO1pyh3_.js"
+  ],
+  "publicBrowserVerification": "En attente de l’autorisation du domaine dans le proxy de l’environnement ; vérifications locales sur le même build réussies."
+}

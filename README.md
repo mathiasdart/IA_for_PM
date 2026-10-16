@@ -1,6 +1,6 @@
 # EPITA Smart Classroom
 
-Application B2B d’aide au contrôle visuel des équipements d’une salle. Le responsable prépare une source visuelle, définit les quantités attendues puis, à terme, obtient un audit accompagné de réserves explicites.
+Application B2B d’aide au contrôle visuel des équipements d’une salle. Le responsable prépare une source visuelle, définit les quantités attendues puis obtient un audit accompagné de réserves explicites.
 
 ## État de la livraison
 
@@ -102,6 +102,6 @@ Source du modèle : [TensorFlow.js COCO-SSD](https://github.com/tensorflow/tfjs-
 - [Plan en trois milestones](docs/ROADMAP.md)
 - [Guide Cloudflare Pages](docs/CLOUDFLARE.md)
 
-Cloudflare Pages : `npm run build`, sortie `dist`, racine du dépôt, Node 22. La branche de production prévue est `main`.
+Cloudflare Workers : `npm run build`, puis `npx wrangler deploy` avec `wrangler.jsonc` ; fichiers statiques dans `dist`, Node 22. La branche de production est `main`.
 
-**URL publique : non déployée à ce stade.** L’hébergement Cloudflare et la disponibilité en ligne doivent être vérifiés séparément des tests locaux.
+**M2 déployé : [ouvrir l’application](https://ia-for-pm.mathiasdart89.workers.dev).** PR #12 fusionnée sur `main`, commit `cbf3c6d`. Le journal Cloudflare du 16 octobre 2026 confirme la publication, version `e2c8f4d7-2c65-4f68-a25c-71bcbc784b04`. La vérification du parcours sur l’URL publique reste distincte de la recette locale. M3 attend la validation explicite du propriétaire.

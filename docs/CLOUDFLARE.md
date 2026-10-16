@@ -14,6 +14,14 @@ Le contrôle GitHub du projet existant est **Workers Builds: ia-for-pm**. Le dé
 
 Vérification locale sans publication : `npm run build` puis `npx wrangler deploy --dry-run`. Les identifiants Cloudflare de déploiement sont fournis par l’intégration Git existante ; aucun secret n’est ajouté au dépôt. Les résultats locaux ne prouvent pas le succès distant : vérifier le contrôle GitHub, l’URL HTTPS et l’analyse réelle après le déploiement de `main`.
 
+### Publication M2 du 16 octobre 2026
+
+- PR #12 fusionnée sur `main` : commit `cbf3c6d73fc51bfbf42dc0aabbc9339d4d8c326f`.
+- Build et `npx wrangler deploy` réussis dans le journal Cloudflare fourni par le propriétaire ; Node 22.23.3, Wrangler 4.151.1.
+- URL publiée : [ia-for-pm.mathiasdart89.workers.dev](https://ia-for-pm.mathiasdart89.workers.dev).
+- Version Cloudflare : `e2c8f4d7-2c65-4f68-a25c-71bcbc784b04`.
+- Les anciens contrôles des branches de travail en échec ne décrivent pas le statut de cette publication sur `main`.
+
 ## Alternative : Cloudflare Pages
 
 Le dépôt doit contenir au moins un commit et une branche distante avant de connecter Pages. Un dépôt vide ne peut pas fournir de branche de production.

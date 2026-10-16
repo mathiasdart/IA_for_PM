@@ -1,0 +1,44 @@
+name: Fonctionnalité
+description: Décrire un besoin métier et sa recette
+title: "[M?-??][P?] "
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Besoin métier
+      description: Utilisateur, action et résultat attendu.
+    validations:
+      required: true
+  - type: dropdown
+    id: milestone
+    attributes:
+      label: Milestone prévu
+      options:
+        - M1 — Interface et configuration
+        - M2 — Détection et audit
+        - M3 — Rapport et livraison
+        - Après MVP
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priorité
+      options:
+        - P0 — Indispensable à la recette
+        - P1 — Livraison et exploitation
+        - P2 — Amélioration
+    validations:
+      required: true
+  - type: textarea
+    id: criteria
+    attributes:
+      label: Critères d’acceptation
+      description: Utiliser des cases à cocher et préciser les moyens de validation.
+      placeholder: "- [ ] Résultat observable et moyen de vérification"
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dépendances et limites

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#174c43" />
+    <meta name="description" content="EPITA Smart Classroom : un audit visuel des équipements, transparent sur ce que l’IA peut vérifier." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>EPITA Smart Classroom — Audit de salle</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Aller au contenu</a>
+    <aside class="sidebar" aria-label="Navigation principale">
+      <a class="brand" href="#accueil" aria-label="EPITA Smart Classroom, accueil">
+        <span class="brand-mark" aria-hidden="true">e<span>.</span></span>
+        <span><strong>EPITA</strong><small>Smart Classroom</small></span>
+      </a>
+      <span class="nav-caption">ESPACE D’AUDIT</span>
+      <nav>
+        <a class="nav-link active" href="#audit"><span data-icon="scan"></span>Audit de la salle</a>
+        <a class="nav-link" href="#configuration"><span data-icon="sliders"></span>Configuration</a>
+        <a class="nav-link" href="#rapport"><span data-icon="file"></span>Rapport d’audit</a>
+        <a class="nav-link" href="#methode"><span data-icon="info"></span>Méthode & limites</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="privacy-mark" data-icon="shield"></div>
+        <strong>Vos images restent ici.</strong>
+        <p>Analyse dans votre navigateur.<br>Aucun enregistrement d’image.</p>
+        <div class="project-tag"><span></span>Espace de contrôle</div>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <span>EPITA <span class="breadcrumb-separator">/</span> Campus intelligent</span>
+        <span class="topbar-right"><span class="small-dot"></span>Traitement local <span class="avatar" aria-label="Responsable de salle">RS</span></span>
+      </header>
+      <main id="main">
+        <section id="accueil" class="page-heading">
+          <div><p class="eyebrow">OBSERVER. COMPARER. VÉRIFIER.</p><h1>Un nouveau regard sur vos salles.</h1><p class="page-description">Vérifiez les équipements visibles et préparez votre contrôle de salle.</p></div>
+          <a class="button button-secondary report-shortcut" href="#rapport"><span data-icon="file"></span>Voir le rapport</a>
+        </section>
+
+        <div class="session-bar">
+          <span class="session-icon" data-icon="building"></span>
+          <label for="room-name">Salle auditée</label>
+          <input id="room-name" type="text" maxlength="80" value="Salle de démonstration" autocomplete="off" />
+          <span id="configuration-badge" class="session-tag">Configuration d’exemple</span>
+          <button id="reset" class="text-button" type="button"><span data-icon="refresh"></span>Nouvel audit</button>
+        </div>
+
+        <section class="metrics" aria-label="Indicateurs de l’audit">
+          <article class="metric"><div class="metric-heading">Objets détectés<span class="metric-icon" data-icon="box"></span></div><strong id="metric-total">—</strong><small id="metric-total-note">En attente d’une analyse</small></article>
+          <article class="metric"><div class="metric-heading">Catégories reconnues<span class="metric-icon" data-icon="layers"></span></div><strong id="metric-categories">—</strong><small>Parmi les équipements ciblés</small></article>
+          <article class="metric"><div class="metric-heading">Règles vérifiables<span class="metric-icon" data-icon="check"></span></div><strong id="metric-rules">—</strong><small id="metric-rules-note">Selon les capacités du modèle</small></article>
+          <article class="metric"><div class="metric-heading">Écarts observés<span class="metric-icon" data-icon="alert"></span></div><strong id="metric-gaps">—</strong><small id="metric-gaps-note">À confirmer sur place</small></article>
+        </section>
+
+        <div id="notification" class="notification" role="status" hidden></div>
+
+        <section id="audit" class="audit-grid" aria-label="Analyse de la salle">
+          <article class="panel capture-panel">
+            <div class="panel-heading"><div><h2><span class="heading-icon" data-icon="scan"></span>Vue de la salle</h2><p>Une image, un état des lieux.</p></div><span id="source-badge" class="badge badge-neutral">Aucune source</span></div>
+            <div class="source-tabs" role="group" aria-label="Source de l’analyse">
+              <button id="tab-image" class="source-tab selected" type="button" aria-pressed="true"><span data-icon="image"></span>Importer une image</button>
+              <button id="tab-camera" class="source-tab" type="button" aria-pressed="false"><span data-icon="camera"></span>Utiliser la caméra</button>
+            </div>
+            <div id="viewfinder" class="viewfinder">
+              <div class="viewfinder-corners" aria-hidden="true"></div>
+              <div id="empty-capture" class="empty-capture">
+                <div class="capture-illustration" aria-hidden="true"><span data-icon="scan"></span></div>
+                <h3 id="capture-title">Votre salle, sous un nouvel angle.</h3>
+                <p id="capture-description">Importez une photo du mobilier et des équipements.<br>Choisissez une vue dégagée, sans personne.</p>
+                <button id="pick-image" class="button button-light" type="button"><span data-icon="upload"></span>Choisir une image</button>
+                <small id="capture-formats">JPEG, PNG ou WebP · 15 Mo maximum</small>
+              </div>
+              <video id="camera" autoplay muted playsinline hidden aria-label="Aperçu de la caméra"></video>
+              <canvas id="frame" hidden aria-label="Image analysée"></canvas>
+              <canvas id="overlay" hidden aria-label="Cadres des équipements détectés"></canvas>
+              <div id="analyzing-overlay" class="analyzing-overlay" hidden><span class="spinner"></span><strong id="analyzing-message">Analyse des équipements…</strong><small>L’image reste dans votre navigateur.</small></div>
+              <span class="viewfinder-label"><span></span>ÉQUIPEMENTS UNIQUEMENT</span>
+            </div>
+            <input id="image-input" type="file" accept="image/jpeg,image/png,image/webp" hidden />
+            <div class="capture-actions"><button id="analyze" class="button button-primary" type="button" disabled aria-describedby="analysis-availability"><span data-icon="scan"></span><span id="analyze-label">Analyser l’image</span></button><button id="start-camera" class="button button-secondary" type="button" hidden><span data-icon="camera"></span>Démarrer la caméra</button><button id="stop-camera" class="button button-secondary" type="button" hidden><span data-icon="stop"></span>Arrêter</button><button id="change-image" class="text-button" type="button" hidden>Changer d’image</button></div>
+            <p id="analysis-availability" class="availability-note">La préparation de la salle est disponible. La détection sera activée à la prochaine étape.</p>
+            <div class="confidence-control"><div><label for="confidence">Seuil de confiance</label><span id="confidence-value">55 %</span></div><input id="confidence" type="range" min="20" max="95" step="5" value="55" /><p>Les détections sous ce seuil sont écartées. Un score élevé ne garantit pas une détection correcte.</p></div>
+          </article>
+
+          <article class="panel results-panel">
+            <div class="panel-heading"><div><h2>Résultat de l’audit</h2><p>Les observations, en toute transparence.</p></div><span data-icon="clipboard" class="muted-icon"></span></div>
+            <div id="audit-status" class="audit-status"><span id="audit-status-icon" data-icon="clock"></span><div><strong id="audit-status-title">Prêt quand vous l’êtes</strong><p id="audit-status-description">Ajoutez une image ou démarrez la caméra pour lancer votre premier audit.</p></div></div>
+            <div class="results-heading"><h3>Équipements observés</h3><span id="detection-count" class="count-label">0 catégorie</span></div>
+            <div id="detections" class="detections"><div class="results-empty"><span data-icon="layers"></span><p>Les résultats de votre analyse<br>apparaîtront ici.</p></div></div>
+            <div class="model-state"><span id="model-dot" class="status-dot"></span><div><strong id="model-label">Détection en préparation</strong><small id="model-detail">COCO-SSD · 4 catégories prévues · Aucun modèle chargé</small></div><button id="retry-model" class="text-button" type="button" hidden>Réessayer</button></div>
+            <div class="note note-amber"><span data-icon="info"></span><p><strong>Non détecté ≠ absent.</strong> Un équipement peut être masqué, hors champ ou mal reconnu. Cet audit accompagne la vérification sur place.</p></div>
+          </article>
+        </section>
+
+        <section id="configuration" class="panel configuration-panel">
+          <div class="panel-heading"><div><p class="eyebrow">VOTRE RÉFÉRENTIEL</p><h2>La configuration attendue</h2><p>Ajustez les quantités pour cette salle. Les valeurs initiales sont fictives.</p></div><button id="reset-config" class="text-button" type="button"><span data-icon="refresh"></span>Valeurs de démonstration</button></div>
+          <div class="table-scroll"><table class="audit-table"><thead><tr><th scope="col">Équipement</th><th scope="col">Attendu</th><th scope="col">Détecté</th><th scope="col">Écart <span class="th-note">observé − attendu</span></th><th scope="col">Vérification</th></tr></thead><tbody id="configuration-rows"></tbody></table></div>
+          <p class="table-footnote"><span data-icon="info"></span>Tableaux et fenêtres : contrôle manuel. Les tables/bureaux et les écrans sont reconnus via des classes approchantes.</p>
+        </section>
+
+        <section id="rapport" class="panel report-panel">
+          <div class="report-intro"><span class="report-icon" data-icon="file"></span><div><p class="eyebrow">UN COMPTE RENDU EXPLOITABLE</p><h2>De l’observation à l’action.</h2><p>Retrouvez le contexte, les écarts et les points à vérifier dans un rapport sans image.</p></div></div>
+          <div class="report-actions"><button id="view-report" class="button button-primary" type="button" disabled><span data-icon="file"></span>Ouvrir le rapport</button><button id="download-report" class="button button-secondary" type="button" disabled><span data-icon="download"></span>Exporter en Markdown</button><small id="report-hint">Disponible après votre première analyse.</small></div>
+        </section>
+
+        <section id="methode" class="method-section">
+          <div class="method-title"><p class="eyebrow">UNE IA QUI CONNAÎT SES LIMITES</p><h2>Une aide au contrôle,<br>avec les réserves nécessaires.</h2><p>L’audit porte sur une seule vue. Il ne constitue pas un inventaire complet de la salle.</p></div>
+          <div class="method-card"><span data-icon="eye"></span><h3>Ce qui est visible</h3><p>Chaises, tables via « dining table », portables et écrans via « tv ». Les tableaux et fenêtres ne sont pas pris en charge.</p></div>
+          <div class="method-card"><span data-icon="shield"></span><h3>Le mobilier, uniquement</h3><p>Cadrez une salle vide. Aucune fonction de reconnaissance, de suivi ou de comptage des personnes. Aucun envoi d’image.</p></div>
+          <div class="method-card"><span data-icon="check"></span><h3>Le dernier mot reste humain</h3><p>Vérifiez les angles morts et les erreurs possibles. Les écarts signalent des points de contrôle, jamais une absence certaine.</p></div>
+        </section>
+        <footer class="footer"><span><strong>EPITA</strong> Smart Classroom</span><span>Des observations claires. Des décisions éclairées.</span><a href="https://github.com/mathiasdart/IA_for_PM" target="_blank" rel="noopener noreferrer">Code source <span aria-hidden="true">↗</span></a></footer>
+      </main>
+    </div>
+
+    <dialog id="report-dialog" class="report-dialog" aria-labelledby="report-dialog-title">
+      <div class="dialog-toolbar"><h2 id="report-dialog-title">Rapport d’audit</h2><div><button id="print-report" class="button button-secondary" type="button"><span data-icon="print"></span>Imprimer / PDF</button><button id="close-report" class="icon-button" type="button" aria-label="Fermer le rapport"><span data-icon="close"></span></button></div></div>
+      <div id="report-content" class="report-content"></div>
+    </dialog>
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>

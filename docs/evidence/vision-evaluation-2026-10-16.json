@@ -1,0 +1,432 @@
+{
+  "at": "2026-10-16T13:54:48.400Z",
+  "model": {
+    "name": "COCO-SSD",
+    "base": "lite_mobilenet_v2",
+    "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/model.json",
+    "runtime": "TensorFlow.js 4.22.0",
+    "minimumScore": 0.2,
+    "maximumDetections": 100,
+    "iouThreshold": 0.5,
+    "classes": [
+      {
+        "id": "chair",
+        "class": "chair",
+        "scoreIndex": 61
+      },
+      {
+        "id": "table",
+        "class": "dining table",
+        "scoreIndex": 66
+      },
+      {
+        "id": "screen",
+        "class": "tv",
+        "scoreIndex": 71
+      },
+      {
+        "id": "laptop",
+        "class": "laptop",
+        "scoreIndex": 72
+      }
+    ]
+  },
+  "dataset": {
+    "name": "Recette M2 — photos autorisées du propriétaire",
+    "independentPhotographs": 2,
+    "situations": 3,
+    "annotationMethod": "Boîtes manuelles, définies avant inférence ; seconde inspection visuelle par le même annotateur, sans relecture indépendante. Boîte englobant les parties visibles, incluant les pieds discernables ; pas d’objet entièrement masqué.",
+    "annotationLimitations": [
+      "Rangée de tables arrière droite de la vue paysage : surface continue sans joint discernable, annotée comme une table. Nombre physique à confirmer.",
+      "Le cas partiel et le négatif sont deux recadrages de la même photo portrait.",
+      "Aucun écran ou portable visible ; aucune mesure de qualité possible pour ces classes."
+    ],
+    "frozenBeforeInferenceAt": "2026-10-16T13:53:47.340913+00:00",
+    "annotationReviewedAt": "2026-10-16T13:54:28.991570+00:00"
+  },
+  "threshold": 0.55,
+  "iouThreshold": 0.5,
+  "cases": [
+    {
+      "id": "equipements-visibles",
+      "sha256": "006e46e823c20a263e7496b4d0ee459979c643a666aaf419f9bca44b9319ee58",
+      "crop": null,
+      "sourceDimensions": [
+        1920,
+        1440
+      ],
+      "width": 1920,
+      "height": 1440,
+      "expected": [
+        {
+          "id": "chair-01",
+          "class": "chair",
+          "bbox": [
+            0.2138158,
+            0.6505848,
+            0.1677632,
+            0.2397661
+          ]
+        },
+        {
+          "id": "chair-02",
+          "class": "chair",
+          "bbox": [
+            0.348136,
+            0.6615497,
+            0.1611842,
+            0.2770468
+          ]
+        },
+        {
+          "id": "chair-03",
+          "class": "chair",
+          "bbox": [
+            0.5169956,
+            0.6988304,
+            0.1617325,
+            0.2953216
+          ]
+        },
+        {
+          "id": "chair-04",
+          "class": "chair",
+          "bbox": [
+            0.7182018,
+            0.8077485,
+            0.2817982,
+            0.1922515
+          ]
+        },
+        {
+          "id": "chair-05",
+          "class": "chair",
+          "bbox": [
+            0.3810307,
+            0.5116959,
+            0.0767544,
+            0.0804094
+          ]
+        },
+        {
+          "id": "chair-06",
+          "class": "chair",
+          "bbox": [
+            0.4588816,
+            0.5109649,
+            0.0751096,
+            0.0826023
+          ]
+        },
+        {
+          "id": "chair-07",
+          "class": "chair",
+          "bbox": [
+            0.2160088,
+            0.495614,
+            0.0696272,
+            0.1038012
+          ]
+        },
+        {
+          "id": "chair-08",
+          "class": "chair",
+          "bbox": [
+            0.8223684,
+            0.5292398,
+            0.1332237,
+            0.1374269
+          ]
+        },
+        {
+          "id": "chair-09",
+          "class": "chair",
+          "bbox": [
+            0.9067982,
+            0.5182749,
+            0.0882675,
+            0.1476608
+          ]
+        },
+        {
+          "id": "chair-10",
+          "class": "chair",
+          "bbox": [
+            0.9747807,
+            0.5402047,
+            0.0252193,
+            0.1081871
+          ]
+        },
+        {
+          "id": "chair-11",
+          "class": "chair",
+          "bbox": [
+            0.745614,
+            0.4875731,
+            0.0822368,
+            0.1125731
+          ]
+        },
+        {
+          "id": "chair-12",
+          "class": "chair",
+          "bbox": [
+            0.8278509,
+            0.4839181,
+            0.089364,
+            0.0877193
+          ]
+        },
+        {
+          "id": "chair-13",
+          "class": "chair",
+          "bbox": [
+            0.9073465,
+            0.4809942,
+            0.0504386,
+            0.0285088
+          ]
+        },
+        {
+          "id": "chair-14",
+          "class": "chair",
+          "bbox": [
+            0.9566886,
+            0.4809942,
+            0.0400219,
+            0.0307018
+          ]
+        },
+        {
+          "id": "chair-15",
+          "class": "chair",
+          "bbox": [
+            0.7105263,
+            0.4663743,
+            0.0614035,
+            0.0584795
+          ]
+        },
+        {
+          "id": "chair-16",
+          "class": "chair",
+          "bbox": [
+            0.7741228,
+            0.4532164,
+            0.0509868,
+            0.0687135
+          ]
+        },
+        {
+          "id": "dining table-01",
+          "class": "dining table",
+          "bbox": [
+            0.1847588,
+            0.5877193,
+            0.3453947,
+            0.2909357
+          ]
+        },
+        {
+          "id": "dining table-02",
+          "class": "dining table",
+          "bbox": [
+            0.5093202,
+            0.5906433,
+            0.3432018,
+            0.2850877
+          ]
+        },
+        {
+          "id": "dining table-03",
+          "class": "dining table",
+          "bbox": [
+            0.3881579,
+            0.499269,
+            0.158443,
+            0.0964912
+          ]
+        },
+        {
+          "id": "dining table-04",
+          "class": "dining table",
+          "bbox": [
+            0.6809211,
+            0.4583333,
+            0.1058114,
+            0.0643275
+          ]
+        },
+        {
+          "id": "dining table-05",
+          "class": "dining table",
+          "bbox": [
+            0.6984649,
+            0.4773392,
+            0.3015351,
+            0.1023392
+          ]
+        },
+        {
+          "id": "dining table-06",
+          "class": "dining table",
+          "bbox": [
+            0.7752193,
+            0.5080409,
+            0.2247807,
+            0.1608187
+          ]
+        }
+      ],
+      "inferenceMs": 5563,
+      "backend": "webgl",
+      "truncated": false,
+      "metrics": {
+        "truePositives": 2,
+        "falsePositives": 0,
+        "falseNegatives": 20,
+        "precision": 1,
+        "recall": 0.09090909090909091
+      },
+      "predictions": [
+        {
+          "class": "chair",
+          "score": 0.8458751440048218,
+          "bbox": [
+            0.5197477340698242,
+            0.6898818016052246,
+            0.1554948091506958,
+            0.3024791479110718
+          ]
+        },
+        {
+          "class": "chair",
+          "score": 0.8032737374305725,
+          "bbox": [
+            0.3531765639781952,
+            0.658455491065979,
+            0.15265491604804993,
+            0.2967109680175781
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vue-partielle",
+      "sha256": "0cacce16a9dea8c365b8ff5d04fea36bb7d5145dc42ec715d044cb66648a7e92",
+      "crop": [
+        0,
+        0.5625,
+        0.5,
+        0.16125
+      ],
+      "sourceDimensions": [
+        1440,
+        1920
+      ],
+      "width": 720,
+      "height": 310,
+      "expected": [
+        {
+          "id": "chair-01",
+          "class": "chair",
+          "bbox": [
+            0,
+            0.0077519,
+            0.52,
+            0.9922481
+          ]
+        },
+        {
+          "id": "chair-02",
+          "class": "chair",
+          "bbox": [
+            0.546,
+            0,
+            0.4533333,
+            1
+          ]
+        },
+        {
+          "id": "dining table-01",
+          "class": "dining table",
+          "bbox": [
+            0.2626667,
+            0,
+            0.7373333,
+            0.5736434
+          ]
+        }
+      ],
+      "inferenceMs": 1171,
+      "backend": "webgl",
+      "truncated": false,
+      "metrics": {
+        "truePositives": 2,
+        "falsePositives": 0,
+        "falseNegatives": 1,
+        "precision": 1,
+        "recall": 0.6666666666666666
+      },
+      "predictions": [
+        {
+          "class": "chair",
+          "score": 0.7816668748855591,
+          "bbox": [
+            0.0012408196926116943,
+            0.004994720220565796,
+            0.4872238039970398,
+            0.9850699007511139
+          ]
+        },
+        {
+          "class": "chair",
+          "score": 0.7090926170349121,
+          "bbox": [
+            0.5129601359367371,
+            0,
+            0.4658123254776001,
+            0.9976787567138672
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aucun-equipement-cible",
+      "sha256": "0cacce16a9dea8c365b8ff5d04fea36bb7d5145dc42ec715d044cb66648a7e92",
+      "crop": [
+        0,
+        0,
+        1,
+        0.35
+      ],
+      "sourceDimensions": [
+        1440,
+        1920
+      ],
+      "width": 1440,
+      "height": 672,
+      "expected": [],
+      "inferenceMs": 1253,
+      "backend": "webgl",
+      "truncated": false,
+      "metrics": {
+        "truePositives": 0,
+        "falsePositives": 0,
+        "falseNegatives": 0,
+        "precision": null,
+        "recall": null
+      },
+      "predictions": []
+    }
+  ],
+  "totals": {
+    "truePositives": 4,
+    "falsePositives": 0,
+    "falseNegatives": 21,
+    "precision": 1,
+    "recall": 0.16,
+    "meanInferenceMs": 2662.3333333333335
+  }
+}

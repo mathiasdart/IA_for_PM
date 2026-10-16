@@ -11,11 +11,13 @@
     "test": "node --test tests/*.test.js",
     "test:e2e": "playwright test",
     "evaluate:vision": "node scripts/evaluate-vision.mjs",
-    "verify:vision-runtime": "node scripts/verify-vision-runtime.mjs"
+    "verify:vision-runtime": "node scripts/verify-vision-runtime.mjs",
+    "verify:vision-photo-ui": "node scripts/verify-vision-photo-ui.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.64.1",
-    "vite": "8.3.4"
+    "vite": "8.3.4",
+    "wrangler": "4.151.1"
   },
   "engines": {
     "node": ">=22.12.0"

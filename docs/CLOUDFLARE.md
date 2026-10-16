@@ -1,4 +1,20 @@
-# Déployer avec Cloudflare Pages
+# Déployer sur Cloudflare
+
+## Projet existant : Workers Builds `ia-for-pm`
+
+Le contrôle GitHub du projet existant est **Workers Builds: ia-for-pm**. Le dépôt contient désormais `wrangler.jsonc` pour publier les fichiers statiques de `dist` avec ce Worker, sans API métier. Wrangler est fixé dans les dépendances de développement et le lockfile.
+
+| Paramètre | Valeur |
+| --- | --- |
+| Branche de production | `main` |
+| Build command | `npm run build` |
+| Deploy command | `npx wrangler deploy` |
+| Configuration | `wrangler.jsonc`, nom `ia-for-pm`, assets `./dist` |
+| Node | 22.12 minimum, branche 22 déclarée dans `.node-version` |
+
+Vérification locale sans publication : `npm run build` puis `npx wrangler deploy --dry-run`. Les identifiants Cloudflare de déploiement sont fournis par l’intégration Git existante ; aucun secret n’est ajouté au dépôt. Les résultats locaux ne prouvent pas le succès distant : vérifier le contrôle GitHub, l’URL HTTPS et l’analyse réelle après le déploiement de `main`.
+
+## Alternative : Cloudflare Pages
 
 Le dépôt doit contenir au moins un commit et une branche distante avant de connecter Pages. Un dépôt vide ne peut pas fournir de branche de production.
 

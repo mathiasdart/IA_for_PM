@@ -58,4 +58,4 @@ Le propriétaire a demandé à préparer Cloudflare dès M1 pour vérifier l’h
 - Un ticket est clôturé uniquement avec des preuves pour ses critères d’acceptation.
 - Une livraison technique ne vaut pas validation du milestone par le propriétaire.
 - Milestones natifs créés le 16 octobre 2026 : [M1](https://github.com/mathiasdart/IA_for_PM/milestone/1), [M2](https://github.com/mathiasdart/IA_for_PM/milestone/2), [M3](https://github.com/mathiasdart/IA_for_PM/milestone/3). Tickets #1–#4 rattachés à M1, #5–#7 et PR #12 à M2, #8–#10 à M3. Ils restent ouverts tant que leurs travaux et validations ne sont pas terminés.
-- M2 reste en recette : vrai modèle exécuté sur une fixture synthétique ; mesures sur les photos du propriétaire en attente de fichiers accessibles au cloud. M3 attend toujours la validation explicite du propriétaire.
+- Recette initiale M2 réalisée sur les photos autorisées du propriétaire : 4 vrais positifs, 0 faux positif, 21 faux négatifs au seuil de 55 %. Rappel 16 % sur trois situations dérivées de deux prises de vue. Publication M2 demandée ; limites explicites et contrôle humain requis. M3 attend toujours la validation explicite du propriétaire.

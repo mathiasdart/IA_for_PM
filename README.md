@@ -4,7 +4,7 @@ Application B2B d’aide au contrôle visuel des équipements d’une salle. Le 
 
 ## État de la livraison
 
-**Milestone 2 : détection et audit, en recette.** Le passage à M2 a été autorisé par le propriétaire après la livraison M1. Le rapport et ses exports restent prévus à M3. Aucun résultat artificiel n’est présenté dans l’application.
+**Milestone 2 : détection et audit, recette initiale réalisée.** Le passage à M2 a été autorisé par le propriétaire après la livraison M1. Le rapport et ses exports restent prévus à M3. Aucun résultat artificiel n’est présenté dans l’application.
 
 - Interface responsive en français et navigation au clavier.
 - Import local JPEG, PNG et WebP, maximum 15 Mo et 40 mégapixels ; redimensionnement d’affichage à 1920 px maximum.
@@ -54,7 +54,7 @@ Ces tests vérifient le parcours avec des médias synthétiques et des autorisat
 
 Pour l’évaluation réelle, voir [le protocole M2 et l’outil de mesure](docs/VALIDATION-M2.md). Les tests simulés et les mesures de vision sont comptabilisés séparément.
 
-Le vrai graphe COCO-SSD et ses poids ont désormais été téléchargés et exécutés sur la fixture synthétique existante (`npm run verify:vision-runtime`). Cela confirme le runtime et le parcours réseau, sans mesure de précision/rappel sur photographies. Les deux photos autorisées du propriétaire attendent leur transfert depuis son PC vers un emplacement accessible au cloud. M2 reste en recette et M3 attend sa validation explicite.
+Le vrai graphe COCO-SSD et ses poids ont désormais été téléchargés et exécutés sur la fixture synthétique existante (`npm run verify:vision-runtime`). Cela confirme le runtime et le parcours réseau, sans mesure de précision/rappel sur photographies. La recette sur les deux photos autorisées du propriétaire est réalisée : trois situations dont deux recadrages, 4 objets appariés sur 25 annotés au seuil de 55 % (rappel 16 %), aucun faux positif sur quatre prédictions. Ce petit jeu confirme une forte sous-détection : contrôle humain indispensable, aucun inventaire exhaustif. Les preuves sans image sont publiées dans le protocole M2 ; M3 attend la validation explicite du propriétaire.
 
 ## Architecture
 

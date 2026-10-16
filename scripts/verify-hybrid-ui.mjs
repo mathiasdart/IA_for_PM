@@ -3,7 +3,9 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { preview } from 'vite';
 import { launchVisionBrowser } from './vision-browser.mjs';
 
-const server = await preview({ preview: { host: '127.0.0.1', port: 5175, strictPort: true } });
+const publicRun = Boolean(process.env.IA_VERIFY_BASE_URL);
+const baseURL = process.env.IA_VERIFY_BASE_URL || 'http://127.0.0.1:5175';
+const server = publicRun ? null : await preview({ preview: { host: '127.0.0.1', port: 5175, strictPort: true } });
 let browser;
 try {
   browser = await launchVisionBrowser();
@@ -13,7 +15,7 @@ try {
   page.on('console', (message) => { if (message.type() === 'error') console.log('console', message.text()); });
   const requests = [];
   page.on('request', (request) => requests.push({ method: request.method(), url: request.url() }));
-  await page.goto('http://127.0.0.1:5175');
+  await page.goto(baseURL);
   await page.locator('#analysis-mode').selectOption('hybrid');
   await page.locator('#image-input').setInputFiles('.vision-data/vue-paysage.jpg');
   await page.locator('#source-badge').filter({ hasText: 'Image prête' }).waitFor();
@@ -56,12 +58,12 @@ try {
   await page.locator('#analysis-mode').selectOption('quick');
   assert.equal(await page.locator('#metric-total').textContent(), '—');
   assert(requests.every((request) => request.method === 'GET'));
-  const external = requests.filter((request) => /^https?:/.test(request.url) && !request.url.startsWith('http://127.0.0.1:'));
+  const external = requests.filter((request) => /^https?:/.test(request.url) && !request.url.startsWith(`${new URL(baseURL).origin}/`));
   assert(external.every((request) => request.url.startsWith('https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/')), JSON.stringify(external));
-  const report = { at: new Date().toISOString(), kind: 'real-compiled-hybrid-ui', browser: browser.version(),
+  const report = { at: new Date().toISOString(), kind: publicRun ? 'real-public-hybrid-ui' : 'real-compiled-hybrid-ui', baseURL, browser: browser.version(),
     total55, total95, durationMs, laptopObserved: laptop, standaloneScreensObserved: screens,
     sourceChangeClearsAudit: true, modeChangeClearsAudit: true, manualCategoriesVerified: true,
     requests, imageUploadObserved: false };
-  await writeFile('docs/evidence/hybrid-ui-2026-10-16.json', JSON.stringify(report, null, 2)+'\n');
+  await writeFile(`docs/evidence/${publicRun ? 'hybrid-public' : 'hybrid-ui'}-2026-10-16.json`, JSON.stringify(report, null, 2)+'\n');
   console.log(JSON.stringify(report));
-} finally { await browser?.close(); await new Promise((resolve) => server.httpServer.close(resolve)); }
+} finally { await browser?.close(); if (server) await new Promise((resolve) => server.httpServer.close(resolve)); }

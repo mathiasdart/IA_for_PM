@@ -41,7 +41,7 @@ Preuves sans photographie :
 
 ## Poids et compilation
 
-L'export ONNX opset 17 pèse 175 032 490 octets, SHA-256 `afd75c22e21d27292c1bfd863849051c306fe8796bfa6bcbd4f8cdc0aa3ee7f3`. Il a été régénéré depuis les poids officiels lors de la reprise du 16 octobre, puis revalidé dans Chromium sur le build compilé ; l’ancien export du handoff n’était pas disponible dans le nouvel environnement. Il est découpé en neuf parties de moins de 20 Mio, adaptées à la limite Cloudflare par fichier. Le moteur WebAssembly ajoute environ 12 Mo. Ces fichiers ne sont chargés par le navigateur qu'en mode combiné ; aucun téléchargement Faster R-CNN lors d'une analyse COCO seule.
+L'export ONNX opset 17 pèse 175 032 490 octets, SHA-256 `748b85212bc0f0a61095ae1a5a9897393445a93a52cd2b732c2ffdad75a43927`. GitHub Actions a reproduit l’empreinte exacte de l’export du handoff avec `PYTHONHASHSEED=0` ; les fichiers téléchargés depuis la release ont été vérifiés partie par partie et après assemblage. Il est découpé en neuf parties de moins de 20 Mio, adaptées à la limite Cloudflare par fichier. Le moteur WebAssembly ajoute environ 12 Mo. Ces fichiers ne sont chargés par le navigateur qu'en mode combiné ; aucun téléchargement Faster R-CNN lors d'une analyse COCO seule.
 
 Le manifeste versionné contient les empreintes de toutes les parties et du modèle entier. `npm run build` télécharge les parties depuis la release GitHub `models-faster-rcnn-v1`, vérifie leurs tailles et SHA-256, puis construit les fichiers statiques. Les parties locales sont ignorées par Git ; les photos le sont également. Le worker vérifie à nouveau les empreintes avant de charger ONNX. Un worker ayant dépassé 180 secondes est arrêté ; changer de mode libère le worker Faster R-CNN chargé.
 

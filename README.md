@@ -16,7 +16,7 @@ Application B2B d’aide au contrôle visuel des équipements d’une salle. Le 
 - Audit d’une image figée : une capture webcam arrête le flux ; un changement de source invalide les résultats.
 - Comptages, écarts par catégorie et statut partiel recalculés selon le seuil et le référentiel.
 - Échec du téléchargement expliqué avec nouvelle tentative. Un objet non détecté n’est jamais déclaré absent.
-- Ni stockage persistant ni envoi de l’image. Les pixels restent temporairement en mémoire jusqu’au changement de source ou au nouvel audit.
+- Aucun envoi pour l’analyse. L’archive Cloudflare privée est facultative et enregistre uniquement après un clic explicite ; autrement les pixels restent temporairement en mémoire jusqu’au changement de source ou au nouvel audit.
 
 ## Démarrer
 

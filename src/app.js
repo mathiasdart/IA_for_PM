@@ -135,7 +135,7 @@ function renderModel() {
   $('model-label').textContent = labels[state.modelState];
   $('model-detail').textContent = state.modelState === 'error'
     ? 'Vérifiez votre connexion ou essayez un mode COCO seul.'
-    : `${$('analysis-mode').value === 'hybrid' ? 'COCO-SSD + Faster R-CNN' : 'COCO-SSD'} · 4 catégories ciblées · Aucun envoi d’image`;
+    : `${$('analysis-mode').value === 'hybrid' ? 'COCO-SSD + Faster R-CNN' : 'COCO-SSD'} · 4 catégories ciblées · Aucun envoi pour l’analyse`;
   $('model-dot').className = `status-dot ${state.modelState}`;
   $('retry-model').hidden = state.modelState !== 'error' || !state.source;
   $('retry-model').disabled = state.busy;

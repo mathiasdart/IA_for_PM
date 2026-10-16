@@ -5,6 +5,8 @@ import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
 import { build } from 'esbuild';
 import { generateKeyPair, exportJWK, SignJWT } from 'jose';
 import { authenticate } from '../worker/auth.js';
+import { createImageApi } from '../worker/images.js';
+import worker from '../worker/index.js';
 
 test('Access vérifie la signature, l’émetteur et l’audience, pas un simple en-tête email', async () => {
   const { publicKey,privateKey } = await generateKeyPair('RS256');
@@ -21,6 +23,15 @@ test('Access vérifie la signature, l’émetteur et l’audience, pas un simple
     await assert.rejects(authenticate(new Request('https://app.test',{ headers:{ 'cf-access-jwt-assertion':await token('another-app') } }),env));
     await assert.rejects(authenticate(new Request('https://app.test',{ headers:{ 'cf-access-authenticated-user-email':'owner@example.test' } }),env));
     await assert.rejects(authenticate(new Request('https://app.test',{ headers:{ 'cf-access-jwt-assertion':`${valid.slice(0,-20)}forged` } }),env));
+    const wrongIssuer = await new SignJWT({ email:'owner@example.test' }).setProtectedHeader({ alg:'RS256',kid:'test-key' })
+      .setSubject('owner').setIssuer('https://another.cloudflareaccess.com').setAudience(env.CF_ACCESS_AUD)
+      .setIssuedAt().setExpirationTime('2m').sign(privateKey);
+    const expired = await new SignJWT({ email:'owner@example.test' }).setProtectedHeader({ alg:'RS256',kid:'test-key' })
+      .setSubject('owner').setIssuer(issuer).setAudience(env.CF_ACCESS_AUD).setIssuedAt(1).setExpirationTime(2).sign(privateKey);
+    const noExpiry = await new SignJWT({ email:'owner@example.test' }).setProtectedHeader({ alg:'RS256',kid:'test-key' })
+      .setSubject('owner').setIssuer(issuer).setAudience(env.CF_ACCESS_AUD).setIssuedAt().sign(privateKey);
+    for (const jwt of [wrongIssuer,expired,noExpiry]) await assert.rejects(authenticate(new Request('https://app.test',
+      { headers:{ 'cf-access-jwt-assertion':jwt } }),env));
   } finally { globalThis.fetch = previousFetch; }
 });
 
@@ -35,10 +46,13 @@ test('D1 et R2 locaux : archivage explicite, lecture privée, isolation des comp
       const url = `http://localhost${path}`;
       const request = new Request(url,{ ...options,
         headers:{ origin:'http://localhost',...(user ? { 'x-test-user':user } : {}),...options.headers } });
-      return mf.dispatchFetch(url,{ method:request.method,headers:Object.fromEntries(request.headers),
+      return mf.dispatchFetch(url,{ method:request.method,redirect:'manual',headers:Object.fromEntries(request.headers),
         ...(request.body ? { body:await request.arrayBuffer() } : {}) });
     };
     assert.equal((await call('/api/images',{},null)).status,401);
+    const login = await call('/api/login');
+    assert.equal(login.status,303);
+    assert.equal(login.headers.get('location'),'http://localhost/#images');
     assert.equal((await call('/api/images',{ method:'POST',headers:{ origin:'https://attacker.test' } })).status,403);
     const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l9sAAAAASUVORK5CYII=','base64');
     const body = new FormData(); body.set('image',new File([png],'test.png',{ type:'image/png' }));
@@ -64,5 +78,32 @@ test('D1 et R2 locaux : archivage explicite, lecture privée, isolation des comp
     invalid.set('metadata',JSON.stringify({ width:1,height:1 }));
     assert.equal((await call('/api/images',{ method:'POST',body:invalid })).status,415);
     assert.equal((await call('/api/images',{ method:'POST',headers:{ 'content-type':'multipart/form-data; boundary=test' },body:new Uint8Array(9000000) })).status,413);
+    // A failed SQL write must not leave a private object behind in R2.
+    await db.exec('DROP TABLE images');
+    assert.equal((await call('/api/images',{ method:'POST',body })).status,500);
+    assert.equal((await (await mf.getR2Bucket('IMAGES')).list()).objects.length,0);
   } finally { await mf.dispose(); }
+});
+
+test('sans configuration Access complète, la production refuse toute archive', async () => {
+  const request = new Request('https://app.test/api/images');
+  assert.equal((await worker.fetch(request,{})).status,503);
+  assert.equal((await worker.fetch(request,{ DB:{},IMAGES:{} })).status,503);
+  const env = { DB:{},IMAGES:{},CF_ACCESS_TEAM_DOMAIN:'test.cloudflareaccess.com',CF_ACCESS_AUD:'test' };
+  const forged = new Request(request,{ headers:{ 'x-test-user':'owner','cf-access-authenticated-user-email':'owner@example.test' } });
+  assert.equal((await worker.fetch(forged,env)).status,401);
+});
+
+test('un corps sans Content-Length dépassant la limite reçoit 413 après drainage', async () => {
+  const imageApi = createImageApi({ authenticate:async()=>({ sub:'owner',email:'owner@example.test' }) });
+  let reads=0;
+  const body = new ReadableStream({ pull(controller) {
+    if (reads===10) { controller.close(); return; }
+    reads++; controller.enqueue(new Uint8Array(1024*1024));
+  } });
+  const request = new Request('https://app.test/api/images',{ method:'POST',duplex:'half',body,
+    headers:{ Origin:'https://app.test','Content-Type':'multipart/form-data; boundary=test' } });
+  const response = await imageApi(request,{ DB:{},IMAGES:{} });
+  assert.equal(response.status,413);
+  assert.equal(reads,10);
 });

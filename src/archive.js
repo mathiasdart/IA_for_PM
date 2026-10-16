@@ -4,9 +4,14 @@ export function initializeArchive({ snapshot,reopen,notify }) {
   let connected=false,saving=false,available=false,next=null;
   function update(value) { available=value; $('archive-save').disabled=!connected || !available || saving; }
   async function api(path,options) {
-    const response=await fetch(path,{ credentials:'same-origin',...options });
+    let response;
+    try { response=await fetch(path,{ credentials:'same-origin',redirect:'error',...options }); }
+    catch { throw new Error('Connexion expirée ou archivage inaccessible. Connectez-vous à l’archive puis actualisez.'); }
     let result;
     try { result=await response.json(); } catch { throw new Error('Archivage indisponible sur ce déploiement.'); }
+    if ([401,403,503].includes(response.status)) {
+      connected=false; $('archive-login').hidden=false; update(available);
+    }
     if (!response.ok) throw new Error(result.error || 'Archivage indisponible.');
     return result;
   }
@@ -45,9 +50,10 @@ export function initializeArchive({ snapshot,reopen,notify }) {
     $('archive-refresh').disabled=true;
     try {
       const session=await api('/api/session'); connected=session.storage===true;
+      $('archive-login').hidden=connected;
       $('archive-status').textContent=`Archive privée de ${session.email}. Rien n’est enregistré automatiquement.`;
       await list();
-    } catch(error) { connected=false; $('archive-status').textContent=error.message; }
+    } catch(error) { connected=false; $('archive-login').hidden=false; $('archive-list').replaceChildren(); next=null; $('archive-more').hidden=true; $('archive-status').textContent=error.message; }
     finally { $('archive-refresh').disabled=false; update(available); }
   }
   $('archive-save').onclick=async()=>{

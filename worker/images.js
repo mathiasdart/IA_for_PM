@@ -12,18 +12,22 @@ export function json(value, status = 200) {
 }
 
 async function limitedBody(request) {
-  if (Number(request.headers.get('content-length')) > MAX_BODY_BYTES) throw new ApiError(413, 'Image trop volumineuse.');
   if (!request.body) throw new ApiError(400, 'Image manquante.');
   const reader = request.body.getReader();
   const chunks = []; let length = 0;
+  let oversized = Number(request.headers.get('content-length')) > MAX_BODY_BYTES;
   try {
     for (;;) {
       const { value, done } = await reader.read(); if (done) break;
       length += value.length;
-      if (length > MAX_BODY_BYTES) { await reader.cancel(); throw new ApiError(413, 'Image trop volumineuse.'); }
-      chunks.push(value);
+      if (length > MAX_BODY_BYTES) oversized = true;
+      // Drain rejected uploads without retaining them. Returning/cancelling while
+      // the HTTP client is still writing can reset the connection before its 413.
+      if (oversized) chunks.length = 0;
+      else chunks.push(value);
     }
   } finally { reader.releaseLock(); }
+  if (oversized) throw new ApiError(413, 'Image trop volumineuse.');
   const bytes = new Uint8Array(length); let offset = 0;
   for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
   return bytes;
@@ -74,6 +78,9 @@ export function createImageApi({ authenticate, configured = (env) => Boolean(env
       catch { return json({ error: 'Connexion requise pour accéder aux images.' }, 401); }
       const url = new URL(request.url);
       if (['POST','DELETE'].includes(request.method) && request.headers.get('Origin') !== url.origin) return json({ error: 'Origine refusée.' }, 403);
+      if (url.pathname === '/api/login' && request.method === 'GET') return new Response(null, {
+        status: 303, headers: { Location: `${url.origin}/#images`, 'Cache-Control': 'private, no-store' },
+      });
       if (url.pathname === '/api/session' && request.method === 'GET') return json({ email: user.email, storage: true });
       if (url.pathname === '/api/images' && request.method === 'GET') {
         const cursor = url.searchParams.get('before');

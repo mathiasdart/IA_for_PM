@@ -16,6 +16,7 @@ export async function authenticate(request, env) {
   if (!keySets.has(issuer)) keySets.set(issuer, createRemoteJWKSet(new URL(`${issuer}/cdn-cgi/access/certs`)));
   const { payload } = await jwtVerify(token, keySets.get(issuer), {
     issuer, audience: env.CF_ACCESS_AUD, algorithms: ['RS256'],
+    requiredClaims: ['sub', 'email', 'iat', 'exp'],
   });
   if (typeof payload.sub !== 'string' || !payload.sub || typeof payload.email !== 'string') throw new Error('AUTH_INVALID');
   return { sub: payload.sub, email: payload.email };

@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@tensorflow/tfjs": "4.22.0",
+    "jose": "^6.1.0",
     "onnxruntime-web": "^1.23.2"
   }
 }

@@ -3,6 +3,7 @@ import { EQUIPMENT, exampleConfiguration, parseQuantity, validateImageFile, came
 import { hydrateIcons, icon } from './icons.js';
 import { buildAudit } from './audit.js';
 import { mergeDetectors } from './detection-ensemble.js';
+import { initializeArchive } from './archive.js';
 
 const $ = (id) => document.getElementById(id);
 const state = {
@@ -13,6 +14,7 @@ const state = {
 const video = $('camera');
 const frame = $('frame');
 let activeFaster;
+let archiveUI;
 const MAX_IMAGE_PIXELS = 40_000_000;
 
 hydrateIcons();
@@ -171,6 +173,7 @@ function drawDetections(predictions) {
 }
 
 function renderAudit() {
+  archiveUI?.update(!state.busy && Boolean(frame.width) && ['image','capture'].includes(state.source));
   const invalid = invalidConfiguration();
   const audit = invalid ? null : buildAudit(state.analysis, state.expected, Number($('confidence').value) / 100);
   const activeBusy = state.busy && state.activeVersion === state.sourceVersion;
@@ -475,5 +478,13 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
+archiveUI=initializeArchive({ notify,reopen:importImage,snapshot:()=>{
+  if (state.busy || !frame.width || !['image','capture'].includes(state.source)) return null;
+  const canvas=document.createElement('canvas'); canvas.width=frame.width; canvas.height=frame.height;
+  canvas.getContext('2d').drawImage(frame,0,0);
+  return { canvas,filename:`${$('room-name').value.trim() || 'salle'}-${Date.now()}.jpg`,
+    analysis:state.analysis && !invalidConfiguration() ? { predictions:state.analysis.predictions,
+      threshold:Number($('confidence').value)/100,expected:{ ...state.expected },at:state.analysis.at } : null };
+} });
 renderConfiguration();
 renderSource();

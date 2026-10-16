@@ -19,13 +19,14 @@
       <nav>
         <a class="nav-link active" href="#audit"><span data-icon="scan"></span>Audit de la salle</a>
         <a class="nav-link" href="#configuration"><span data-icon="sliders"></span>Configuration</a>
+        <a class="nav-link" href="#images"><span data-icon="image"></span>Mes images</a>
         <a class="nav-link" href="#rapport"><span data-icon="file"></span>Rapport d’audit</a>
         <a class="nav-link" href="#methode"><span data-icon="info"></span>Méthode & limites</a>
       </nav>
       <div class="sidebar-bottom">
         <div class="privacy-mark" data-icon="shield"></div>
-        <strong>Vos images restent ici.</strong>
-        <p>Analyse dans votre navigateur.<br>Aucun enregistrement d’image.</p>
+        <strong>Analyse sur cet appareil.</strong>
+        <p>Archive Cloudflare facultative.<br>Enregistrement sur votre demande.</p>
         <div class="project-tag"><span></span>Espace de contrôle</div>
       </div>
     </aside>
@@ -103,6 +104,14 @@
           <p class="table-footnote"><span data-icon="info"></span>Tableaux et fenêtres : contrôle manuel. Les tables/bureaux et les écrans sont reconnus via des classes approchantes.</p>
         </section>
 
+        <section id="images" class="panel archive-panel">
+          <div class="panel-heading"><div><p class="eyebrow">VOTRE ARCHIVE PRIVÉE</p><h2>Mes images enregistrées</h2><p>Enregistrez la vue affichée en JPEG et son analyse si disponible. Les fichiers sont conservés dans Cloudflare uniquement après votre clic.</p></div></div>
+          <div class="archive-actions"><button id="archive-save" class="button button-primary" type="button" disabled>Enregistrer cette vue dans Cloudflare</button><button id="archive-refresh" class="button button-secondary" type="button">Actualiser l’archive</button></div>
+          <p id="archive-status" class="availability-note" role="status">Vérification de l’accès à l’archive…</p>
+          <div id="archive-list" class="archive-list"></div>
+          <button id="archive-more" class="text-button" type="button" hidden>Afficher les images suivantes</button>
+        </section>
+
         <section id="rapport" class="panel report-panel">
           <div class="report-intro"><span class="report-icon" data-icon="file"></span><div><p class="eyebrow">UN COMPTE RENDU EXPLOITABLE</p><h2>De l’observation à l’action.</h2><p>Retrouvez le contexte, les écarts et les points à vérifier dans un rapport sans image.</p></div></div>
           <div class="report-actions"><button id="view-report" class="button button-primary" type="button" disabled><span data-icon="file"></span>Ouvrir le rapport</button><button id="download-report" class="button button-secondary" type="button" disabled><span data-icon="download"></span>Exporter en Markdown</button><small id="report-hint">Disponible après votre première analyse.</small></div>
@@ -111,7 +120,7 @@
         <section id="methode" class="method-section">
           <div class="method-title"><p class="eyebrow">UNE IA QUI CONNAÎT SES LIMITES</p><h2>Une aide au contrôle,<br>avec les réserves nécessaires.</h2><p>L’audit porte sur une seule vue. Il ne constitue pas un inventaire complet de la salle.</p></div>
           <div class="method-card"><span data-icon="eye"></span><h3>Ce qui est visible</h3><p>Chaises, tables via « dining table », portables et écrans via « tv ». Les tableaux et fenêtres ne sont pas pris en charge.</p></div>
-          <div class="method-card"><span data-icon="shield"></span><h3>Le mobilier, uniquement</h3><p>Cadrez une salle vide. Le modèle générique traite l’image entière ; seules les classes d’équipements sont exploitées. Aucun résultat sur les personnes, aucun envoi d’image.</p></div>
+          <div class="method-card"><span data-icon="shield"></span><h3>Le mobilier, uniquement</h3><p>Cadrez une salle vide. Le modèle générique traite l’image entière ; seules les classes d’équipements sont exploitées. Aucun résultat sur les personnes. Aucun envoi pour l’analyse ; archivage facultatif sur demande.</p></div>
           <div class="method-card"><span data-icon="check"></span><h3>Le dernier mot reste humain</h3><p>Vérifiez les angles morts et les erreurs possibles. Les écarts signalent des points de contrôle, jamais une absence certaine.</p></div>
         </section>
         <footer class="footer"><span><strong>EPITA</strong> Smart Classroom</span><span>Des observations claires. Des décisions éclairées.</span><a href="https://github.com/mathiasdart/IA_for_PM" target="_blank" rel="noopener noreferrer">Code source <span aria-hidden="true">↗</span></a></footer>

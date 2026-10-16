@@ -16,7 +16,7 @@ Application B2B d’aide au contrôle visuel des équipements d’une salle. Le 
 - Audit d’une image figée : une capture webcam arrête le flux ; un changement de source invalide les résultats.
 - Comptages, écarts par catégorie et statut partiel recalculés selon le seuil et le référentiel.
 - Échec du téléchargement expliqué avec nouvelle tentative. Un objet non détecté n’est jamais déclaré absent.
-- Ni stockage persistant ni envoi de l’image. Les pixels restent temporairement en mémoire jusqu’au changement de source ou au nouvel audit.
+- Aucun envoi pour l’analyse. L’archive Cloudflare privée est facultative et enregistre uniquement après un clic explicite ; autrement les pixels restent temporairement en mémoire jusqu’au changement de source ou au nouvel audit.
 
 ## Démarrer
 
@@ -58,7 +58,9 @@ La recette initiale M2 est conservée dans le protocole. Les améliorations suiv
 
 ## Architecture
 
-Frontend statique HTML, CSS et JavaScript ES modules, assemblé par Vite. Aucune API d’analyse ni base de données. Faster R-CNN utilise ONNX Runtime Web 1.23.2 dans un worker WebAssembly, à la demande. Ses poids (environ 175 Mo) sont servis avec les fichiers statiques ; aucune photo n’est envoyée. TensorFlow.js 4.22.0 est une dépendance runtime versionnée, compilée dans un module chargé à la demande. Les poids du modèle sont téléchargés depuis Google Cloud Storage ; aucune image n’est envoyée à ce service.
+Frontend HTML, CSS et JavaScript ES modules, assemblé par Vite. L’analyse reste entièrement locale : Faster R-CNN utilise ONNX Runtime Web 1.23.2 dans un worker WebAssembly, à la demande. Ses poids (environ 175 Mo) sont servis avec les fichiers statiques. TensorFlow.js 4.22.0 est une dépendance runtime versionnée, compilée dans un module chargé à la demande. Les poids COCO sont téléchargés depuis Google Cloud Storage ; aucune image n’est envoyée à ce service.
+
+L’archive facultative utilise un Worker, D1 pour les métadonnées/résultats et R2 privé pour les fichiers. Seul le bouton d’enregistrement envoie une copie JPEG et l’analyse éventuelle. Cloudflare Access authentifie chaque propriétaire ; sans configuration complète, l’archivage reste désactivé et l’analyse locale fonctionne. Voir [le provisionnement, la confidentialité et la recette](docs/IMAGE-ARCHIVE.md). La configuration distante et la recette Access restent à terminer avant activation en production.
 
 ```text
 index.html                    Structure et parcours

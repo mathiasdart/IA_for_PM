@@ -5,6 +5,17 @@
   "previews": {},
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "single-page-application"
-  }
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api/*"
+    ]
+  },
+  "main": "worker/index.js",
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "ia_for_pm",
+    "database_id": "69e680df-5f6d-4d2c-98aa-d33a52d597d9",
+    "migrations_dir": "migrations"
+  }]
 }

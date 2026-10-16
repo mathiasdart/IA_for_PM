@@ -1,0 +1,46 @@
+{
+  "at": "2026-10-16T15:50:07.154399+00:00",
+  "kind": "private-image-archive-local-validation",
+  "unitTests": {
+    "passed": 27,
+    "failed": 0
+  },
+  "browserTests": {
+    "passed": 26,
+    "failed": 0,
+    "api": "simulated"
+  },
+  "additionalArchiveBrowserRun": {
+    "passed": 4,
+    "failed": 0
+  },
+  "apiIntegration": "real local D1 and R2 via Miniflare",
+  "checks": [
+    "JWT signature/issuer/audience/expiration/required claims",
+    "production entrypoint fails closed without complete configuration",
+    "explicit save only; no POST at import or analysis",
+    "private read and per-owner list/read/delete isolation",
+    "reopen invalidates prior analysis",
+    "save failures and unavailable authentication/storage",
+    "HTTP 413 with Content-Length and streamed body",
+    "R2 cleanup after failed D1 insert"
+  ],
+  "productionBuild": true,
+  "wranglerDryRun": true,
+  "d1": {
+    "name": "ia_for_pm",
+    "id": "69e680df-5f6d-4d2c-98aa-d33a52d597d9",
+    "source": "provided by owner",
+    "migrationAppliedRemotely": false
+  },
+  "remoteArchiveVerified": false,
+  "remoteBlockers": {
+    "workersSettingsHTTP": 403,
+    "d1HTTP": 401,
+    "r2HTTP": 403,
+    "access": "not enabled at last check",
+    "authorizedEmails": "awaiting owner choice"
+  },
+  "remoteImagesUploaded": false,
+  "m3Started": false
+}

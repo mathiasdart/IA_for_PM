@@ -50,7 +50,7 @@ Les tenseurs d’entrée et de sortie sont libérés après chaque inférence. L
 
 Le modèle générique extrait des caractéristiques sur l’image entière et calcule des sorties génériques. Restreindre les colonnes exploitées n’équivaut pas à empêcher tout calcul interne influencé par une personne. L’application ne reconnaît, n’identifie, ne suit et ne compte aucune personne. Il faut cadrer une salle vide et arrêter/recommencer si une personne entre dans le champ.
 
-Les fichiers de modèle sont téléchargés par des requêtes GET avec identifiants omis et sans référent ; le fournisseur reçoit les métadonnées réseau ordinaires de ce téléchargement. Les images ne sont ni transmises ni stockées durablement. Aucun historique d’audit ou mécanisme de suivi utilisateur n’est ajouté.
+Les fichiers de modèle sont téléchargés par des requêtes GET avec identifiants omis et sans référent ; le fournisseur reçoit les métadonnées réseau ordinaires de ce téléchargement. Aucune image n’est envoyée pour l’analyse. L’archive privée facultative peut conserver une copie JPEG et les résultats uniquement après le clic d’enregistrement ; D1/R2 et Cloudflare Access sont décrits dans [le guide de l’archive](IMAGE-ARCHIVE.md). Sans ce clic, les pixels restent en mémoire temporaire.
 
 ## Audit
 

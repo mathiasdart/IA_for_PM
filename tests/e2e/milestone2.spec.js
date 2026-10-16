@@ -54,6 +54,20 @@ test('modifier le référentiel recalcule les écarts et une nouvelle source eff
   await expect(page.locator('#overlay')).toBeHidden();
 });
 
+test('changer le mode invalide les résultats et la nouvelle analyse utilise le mode choisi', async ({ page }) => {
+  await prepare(page, `export async function getDetector(){return {async detect(canvas,options){window.__analysisMode=options.detailed;return {predictions:[],inferenceMs:1,regions:options.detailed?5:1}}}}`);
+  await expect(page.locator('#analysis-mode')).toHaveValue('detailed');
+  await page.locator('#analyze').click();
+  await expect(page.locator('#metric-total')).toHaveText('0');
+  expect(await page.evaluate(() => window.__analysisMode)).toBe(true);
+  await page.locator('#analysis-mode').selectOption('quick');
+  await expect(page.locator('#metric-total')).toHaveText('—');
+  await expect(page.locator('#notification')).toContainText('Relancez l’analyse');
+  await page.locator('#analyze').click();
+  await expect(page.locator('#metric-total')).toHaveText('0');
+  expect(await page.evaluate(() => window.__analysisMode)).toBe(false);
+});
+
 test('un modèle indisponible ne produit aucun résultat et permet de réessayer', async ({ page }) => {
   await prepare(page, `let n=0;export async function getDetector(){if(n++===0)throw Error('Network');return {async detect(){return {predictions:[],inferenceMs:1}}}}`);
   await page.locator('#analyze').click();
@@ -62,6 +76,37 @@ test('un modèle indisponible ne produit aucun résultat et permet de réessayer
   await page.locator('#retry-model').click();
   await expect(page.locator('#metric-total')).toHaveText('0');
   await expect(page.locator('#model-label')).toContainText('Modèle prêt');
+});
+
+test('le mode combiné fusionne les doublons et indique la provenance des scores', async ({ page }) => {
+  await page.route(/\/src\/faster-detector\.js(?:\?.*)?$/, (route) => route.fulfill({
+    contentType: 'application/javascript', body: `export async function getFasterDetector(){return {
+      async detect(){return {predictions:[{class:'chair',score:.95,bbox:[0,0,1,1],model:'faster-rcnn'}],inferenceMs:25}},
+      dispose(){window.__fasterDisposed=true}}}`,
+  }));
+  await prepare(page, detector());
+  await page.locator('#analysis-mode').selectOption('hybrid');
+  await page.locator('#analyze').click();
+  await expect(page.locator('#metric-total')).toHaveText('2');
+  await expect(page.locator('#detections')).toContainText('95 % (Faster R-CNN)');
+  await expect(page.locator('#analysis-meta')).toContainText('COCO-SSD détaillé + Faster R-CNN');
+  await page.locator('#analysis-mode').selectOption('quick');
+  await expect(page.locator('#metric-total')).toHaveText('—');
+  expect(await page.evaluate(() => window.__fasterDisposed)).toBe(true);
+});
+
+test('un échec Faster R-CNN ne présente pas COCO seul comme un résultat combiné', async ({ page }) => {
+  await page.route(/\/src\/faster-detector\.js(?:\?.*)?$/, (route) => route.fulfill({
+    contentType: 'application/javascript', body: `export async function getFasterDetector(){throw Error('WASM memory');}`,
+  }));
+  await prepare(page, detector());
+  await page.locator('#analysis-mode').selectOption('hybrid');
+  await page.locator('#analyze').click();
+  await expect(page.locator('#notification')).toContainText('Le mode combiné a échoué');
+  await expect(page.locator('#metric-total')).toHaveText('—');
+  await page.locator('#analysis-mode').selectOption('quick');
+  await page.locator('#analyze').click();
+  await expect(page.locator('#metric-total')).toHaveText('2');
 });
 
 test('aucune détection ne prouve pas l’absence et les catégories manuelles restent séparées', async ({ page }) => {
@@ -171,5 +216,18 @@ test('TensorFlow exécute un graphe synthétique avec coordonnées et libératio
   expect(metrics.after).toBe(metrics.before);
   expect(metrics.predictions.map((item) => item.class)).toEqual(['chair', 'laptop']);
   expect(metrics.predictions[0].bbox[0]).toBeCloseTo(0.1);
+  const detailedMetrics = await page.evaluate(async (url) => {
+    const tf = await import(url);
+    const { getDetector } = await import('/src/detector.js');
+    const detector = await getDetector();
+    const canvas = document.createElement('canvas');
+    canvas.width = 1000; canvas.height = 800;
+    const before = tf.memory().numTensors;
+    const result = await detector.detect(canvas, { detailed: true });
+    await detector.detect(canvas, { detailed: true });
+    return { before, after: tf.memory().numTensors, regions: result.regions };
+  }, runtimeUrl);
+  expect(detailedMetrics.regions).toBe(5);
+  expect(detailedMetrics.after).toBe(detailedMetrics.before);
   expect(requests.every((method) => method === 'GET')).toBe(true);
 });

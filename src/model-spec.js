@@ -1,8 +1,14 @@
+export const MODEL_VARIANTS = Object.freeze({
+  lite_mobilenet_v2: 'https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/model.json',
+  mobilenet_v2: 'https://storage.googleapis.com/tfjs-models/savedmodel/ssd_mobilenet_v2/model.json',
+});
+
 export const MODEL = Object.freeze({
   name: 'COCO-SSD',
   base: 'lite_mobilenet_v2',
   url: 'https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/model.json',
   runtime: 'TensorFlow.js 4.22.0',
+  detailed: true,
   minimumScore: 0.2,
   maximumDetections: 100,
   iouThreshold: 0.5,

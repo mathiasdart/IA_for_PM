@@ -1,0 +1,63 @@
+{
+  "model": "fasterrcnn_resnet50_fpn_v2",
+  "weights": "COCO_V1",
+  "weightsUrl": "https://download.pytorch.org/models/fasterrcnn_resnet50_fpn_v2_coco-dd69338a.pth",
+  "format": "onnx",
+  "opset": 17,
+  "bytes": 175032490,
+  "sha256": "748b85212bc0f0a61095ae1a5a9897393445a93a52cd2b732c2ffdad75a43927",
+  "parts": [
+    {
+      "file": "model-00.bin",
+      "bytes": 20971520,
+      "sha256": "44c7540a4fdd8f5be7dbc1a62a510decfb40c5a00b8944d5a92332dcb480ee00"
+    },
+    {
+      "file": "model-01.bin",
+      "bytes": 20971520,
+      "sha256": "1a2ed0979ae742afc0a1d03e5c80d3be89a48a39563d573196f3ad9efaca087a"
+    },
+    {
+      "file": "model-02.bin",
+      "bytes": 20971520,
+      "sha256": "3370ecab69584498a7cc0e41346a1edafc4413d05907a9e5612e075e3effa081"
+    },
+    {
+      "file": "model-03.bin",
+      "bytes": 20971520,
+      "sha256": "a56ac044dedaed87437217fd455bdebca4c91e3334be83647b9b11fa8fe64e43"
+    },
+    {
+      "file": "model-04.bin",
+      "bytes": 20971520,
+      "sha256": "b8e69d3e36082c772b9f152540c3f6c30179279ddf6b275ebb106583fc5ff848"
+    },
+    {
+      "file": "model-05.bin",
+      "bytes": 20971520,
+      "sha256": "6d61f4eeef459684bb1216a713cb4a505d4ff7fb250200446b8d666b23f1df86"
+    },
+    {
+      "file": "model-06.bin",
+      "bytes": 20971520,
+      "sha256": "1738b1b337c6fabf74c50250998fced26a5610383df78f47a1b5cf5976480538"
+    },
+    {
+      "file": "model-07.bin",
+      "bytes": 20971520,
+      "sha256": "8d8a814d172a3dbf21c31a227cfc4b4eedea311fb38aa3b7724e2fb82c7ba4a9"
+    },
+    {
+      "file": "model-08.bin",
+      "bytes": 7260330,
+      "sha256": "360010cc8f7b00141b4a80dd40a731d6199bf0a71b7f0a8a71b0ab11d96d1bc4"
+    }
+  ],
+  "input": "float32 RGB CHW in [0,1]; normalization and resizing are in the graph",
+  "outputs": [
+    "boxes xyxy pixels",
+    "labels COCO category IDs",
+    "scores"
+  ],
+  "exportTorch": "2.8.0+cpu"
+}

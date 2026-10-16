@@ -1,0 +1,124 @@
+{
+  "at": "2026-10-16T15:12:50.582Z",
+  "kind": "real-compiled-hybrid-ui",
+  "browser": "154.0.8037.57",
+  "total55": 26,
+  "total95": 9,
+  "durationMs": 54056,
+  "laptopObserved": "1",
+  "standaloneScreensObserved": "0",
+  "sourceChangeClearsAudit": true,
+  "modeChangeClearsAudit": true,
+  "manualCategoriesVerified": true,
+  "requests": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5175/"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5175/assets/index-CnGGDxC2.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5175/assets/index-B2jJ_HvL.css"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5175/favicon.svg"
+    },
+    {
+      "method": "GET",
+      "url": "blob:http://127.0.0.1:5175/404dbfc0-bd63-46ed-aa9e-8002b31adc24"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5175/assets/detector-D2m6AejW.js"
+    },
+    {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/model.json"
+    },
+    {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard1of5"
+    },
+    {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard2of5"
+    },
+    {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard3of5"
+    },
+    {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard4of5"
+    },
+    {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard5of5"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5175/assets/faster-detector-4nb5Px-_.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5175/assets/faster-worker-wiDV5q8B.js"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5175/models/faster-rcnn/manifest.json"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5175/models/faster-rcnn/model-00.bin"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5175/models/faster-rcnn/model-01.bin"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5175/models/faster-rcnn/model-02.bin"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5175/models/faster-rcnn/model-03.bin"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5175/models/faster-rcnn/model-04.bin"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5175/models/faster-rcnn/model-05.bin"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5175/models/faster-rcnn/model-06.bin"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5175/models/faster-rcnn/model-07.bin"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5175/models/faster-rcnn/model-08.bin"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5175/assets/ort-wasm-simd-threaded-CxTQ5xH-.wasm"
+    },
+    {
+      "method": "GET",
+      "url": "blob:http://127.0.0.1:5175/9d13421a-80b1-407a-b424-320f49b19f97"
+    },
+    {
+      "method": "GET",
+      "url": "blob:http://127.0.0.1:5175/5b989e7e-8e87-4bc8-847a-0915b965fa4a"
+    }
+  ],
+  "imageUploadObserved": false
+}

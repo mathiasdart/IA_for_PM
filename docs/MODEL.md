@@ -2,7 +2,7 @@
 
 ## Décision
 
-MVP : modèle supervisé déjà entraîné, puis amélioration métier après évaluation. Aucune collecte de données d’entraînement ni modification des poids dans M2. Le réglage du seuil est une calibration de restitution, pas un entraînement.
+MVP : modèle supervisé déjà entraîné, puis amélioration métier après évaluation. Aucune modification des poids livrée dans M2. Un premier jeu de tableaux est préparé, mais insuffisant pour entraîner et valider une extension. Le réglage du seuil est une calibration de restitution, pas un entraînement.
 
 - Runtime : TensorFlow.js **4.22.0**, version fixée dans npm et le lockfile.
 - Modèle : graphe **SSDLite MobileNet v2** utilisé par le package COCO-SSD.
@@ -11,6 +11,10 @@ MVP : modèle supervisé déjà entraîné, puis amélioration métier après é
 - Backend : WebGL si disponible, sinon CPU. Le modèle reste en mémoire pour les analyses suivantes dans la même page.
 - Le graphe et ses poids sont téléchargés à la première analyse. Le téléchargement peut échouer ou être lent. Le délai réseau est limité à 90 secondes, puis une nouvelle tentative est proposée.
 - L’URL officielle n’est pas versionnée par une empreinte cryptographique ; un changement du modèle distant exige une nouvelle validation. Les dimensions des sorties sont vérifiées avant exploitation.
+
+## Extension demandée le 16 octobre 2026
+
+COCO détaillé et Faster R-CNN sont décrits dans [la recette des améliorations](DETECTION-QUALITY.md). Faster R-CNN ResNet50 FPN V2 COCO_V1 est converti en ONNX et exécuté localement dans un worker WebAssembly. Il partage les mêmes quatre catégories et ne reconnaît pas les tableaux. Aucun réentraînement ni API serveur n’est ajouté.
 
 ## Correspondance des catégories
 

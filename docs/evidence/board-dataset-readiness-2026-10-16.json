@@ -1,0 +1,15 @@
+{
+  "kind": "whiteboard-data-preparation-only",
+  "trainingPerformed": false,
+  "independentGroups": 1,
+  "allAnnotationsReviewed": false,
+  "counts": {
+    "train_positive": 2,
+    "train_negative": 2
+  },
+  "structurallyReadyForTraining": false,
+  "generalizationValidated": false,
+  "remaining": [
+    "Relire les annotations et constituer des partitions indépendantes train/validation/test, chacune avec des tableaux et des négatifs."
+  ]
+}

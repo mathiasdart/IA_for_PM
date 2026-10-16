@@ -1,0 +1,126 @@
+{
+  "at": "2026-10-16T13:47:25.466Z",
+  "kind": "runtime-smoke-synthetic-input",
+  "recognitionQualityMeasured": false,
+  "model": {
+    "name": "COCO-SSD",
+    "base": "lite_mobilenet_v2",
+    "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/model.json",
+    "runtime": "TensorFlow.js 4.22.0",
+    "minimumScore": 0.2,
+    "maximumDetections": 100,
+    "iouThreshold": 0.5,
+    "classes": [
+      {
+        "id": "chair",
+        "class": "chair",
+        "scoreIndex": 61
+      },
+      {
+        "id": "table",
+        "class": "dining table",
+        "scoreIndex": 66
+      },
+      {
+        "id": "screen",
+        "class": "tv",
+        "scoreIndex": 71
+      },
+      {
+        "id": "laptop",
+        "class": "laptop",
+        "scoreIndex": 72
+      }
+    ]
+  },
+  "browser": "154.0.8037.57",
+  "backend": "webgl",
+  "input": {
+    "description": "PNG synthétique 1 × 1 des fixtures navigateur existantes ; aucune photographie",
+    "sha256": "a38a4ff7320a3d8764ac959b264f15e335360d7c1e23a0627dee7f366c95c58f"
+  },
+  "firstAnalysisMs": 13862,
+  "runs": [
+    {
+      "predictions": [],
+      "truncated": false,
+      "inferenceMs": 1027
+    },
+    {
+      "predictions": [],
+      "truncated": false,
+      "inferenceMs": 1092
+    }
+  ],
+  "ui": {
+    "totalAt95": 0,
+    "chairDifference": "-1",
+    "boardStatus": "Contrôle manuel",
+    "windowStatus": "Contrôle manuel",
+    "conclusion": "Cela ne prouve aucune absence. Essayez un autre cadrage ou un seuil plus bas, puis contrôlez sur place."
+  },
+  "requests": [
+    {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/model.json"
+    },
+    {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard1of5"
+    },
+    {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard2of5"
+    },
+    {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard3of5"
+    },
+    {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard4of5"
+    },
+    {
+      "method": "GET",
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard5of5"
+    }
+  ],
+  "downloads": [
+    {
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard1of5",
+      "status": 200,
+      "bytes": 4194304,
+      "sha256": "0e7af0f713e98521252321f7f84892c31cefccccec3ac64c84e5065b75ed5646"
+    },
+    {
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard2of5",
+      "status": 200,
+      "bytes": 4194304,
+      "sha256": "74cc6cfc2c4510c9cd81b8ad4cebf6f6a8f305119bb365ce0eb96276da38519a"
+    },
+    {
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard3of5",
+      "status": 200,
+      "bytes": 4194304,
+      "sha256": "50383033f893eae136392a403e8f70ade5efd90867df5695c4ca5ac640e14f38"
+    },
+    {
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard4of5",
+      "status": 200,
+      "bytes": 4194304,
+      "sha256": "d856dc534c780068bbf6c666ce1516df2c8433d87578aa31fcdf197de7058cc2"
+    },
+    {
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/group1-shard5of5",
+      "status": 200,
+      "bytes": 1257312,
+      "sha256": "3d356f1fb6dfca6af78c56db34d9326706d0196e303f9de6b04f236ca79ed309"
+    },
+    {
+      "url": "https://storage.googleapis.com/tfjs-models/savedmodel/ssdlite_mobilenet_v2/model.json",
+      "status": 200,
+      "bytes": 527315,
+      "sha256": "3770b2528339b1e3340cb74360e1e40401816b009779aeb8d0cce3a4353ea3a9"
+    }
+  ]
+}

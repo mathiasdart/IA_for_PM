@@ -4,7 +4,9 @@
 
 Les tests unitaires valident les règles et les géométries. Les tests navigateur utilisent des médias et des prédictions synthétiques pour valider le parcours. Un petit graphe synthétique teste le vrai chargement et l’exécution TensorFlow ; il ne reconnaît aucun objet réel.
 
-**Aucune mesure de précision ou rappel sur photographies n’est annoncée à ce stade.** L’environnement de développement bloque actuellement `storage.googleapis.com`. Il faut autoriser ce domaine pour exécuter le vrai modèle ici, ou lancer la recette sur une machine qui peut y accéder. Le jeu de photos annotées reste à constituer ; il ne doit contenir aucune personne.
+**Aucune mesure de précision ou rappel sur photographies n’est annoncée à ce stade.** Le blocage réseau initial est levé : le graphe officiel et ses cinq fichiers de poids ont été téléchargés et exécutés dans Chromium le 16 octobre 2026. Cette vérification utilise le PNG synthétique 1 × 1 des fixtures existantes ; elle ne valide pas la reconnaissance d’équipements photographiés.
+
+Le propriétaire a fourni deux aperçus de photos de salle, sans personne visible, et autorisé leur utilisation pour la recette. Les chemins indiqués (`C:/Users/.../Downloads/`) désignent son PC Windows ; les fichiers JPEG ne sont pas présents dans l’environnement cloud. Aucun fichier ni photo n’a été reconstitué à partir de l’aperçu. L’annotation et l’évaluation attendent des fichiers accessibles au processus de mesure (dépôt, dossier `.vision-data/` ou lien téléchargeable).
 
 ## Résultats du 16 octobre 2026
 
@@ -14,9 +16,14 @@ Les tests unitaires valident les règles et les géométries. Les tests navigate
 | Tests navigateur, régressions M1 comprises | 19 réussis sur Chromium |
 | Compilation de production | Réussie, module TensorFlow chargé séparément à la demande |
 | Graphe synthétique exécuté par TensorFlow | Deux équipements attendus, coordonnées vérifiées, nombre de tenseurs stable après une nouvelle inférence |
-| Téléchargement du vrai modèle depuis cet environnement | Refus HTTP 403 via le proxy, domaine non autorisé |
+| Téléchargement du vrai modèle depuis cet environnement | Réussi : HTTP 200 sur le graphe officiel et les cinq fichiers de poids, TLS vérifié |
+| Exécution du vrai COCO-SSD sur la fixture PNG synthétique | Réussie sur WebGL ; chargement et première analyse 13 862 ms, inférences suivantes 1 027 et 1 092 ms ; aucune prédiction retenue à partir de 20 % |
 | Précision/rappel COCO-SSD sur photos | Non mesurés |
 | Webcam physique et recette métier | À confirmer sur appareil client |
+
+Preuve machine sans image : [vision-runtime-2026-10-16.json](evidence/vision-runtime-2026-10-16.json). Elle contient la version de Chromium, le backend, les requêtes et les empreintes SHA-256 du graphe, de chaque fichier de poids et du média synthétique. Les six requêtes externes observées sont des GET vers les fichiers du modèle ; aucun envoi d’image n’a été observé pendant ce contrôle. Les mesures de durée concernent ce navigateur cloud, pas les appareils clients.
+
+Le parcours avec le vrai modèle a également vérifié le passage à 95 %, le recalcul d’un écart de chaise à −1, les catégories manuelles et le message « Cela ne prouve aucune absence ». Les tests de cadres et scores avec objets reconnus restent synthétiques tant que les JPEG ne sont pas disponibles.
 
 Le build émet un avertissement de taille pour le module TensorFlow (environ 1 Mo minifié, 258 ko gzip). Il est chargé à la première analyse et ne bloque pas l’affichage initial. La performance réelle doit être mesurée sur les appareils cibles.
 
@@ -27,6 +34,7 @@ npm ci
 npm test
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e
 npm run build
+PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run verify:vision-runtime
 ```
 
 Sans Chromium système, utiliser `npx playwright install chromium` puis `npm run test:e2e`.
@@ -45,6 +53,8 @@ Couverture :
 
 La webcam physique et les autorisations d’un appareil client nécessitent une vérification manuelle. Les tests de navigation ne constituent pas un audit d’accessibilité exhaustif.
 
+`verify:vision-runtime` télécharge le vrai graphe et ses poids, sans interception ni remplacement de réponse. Il produit `test-results/vision-runtime.json`, explicitement marqué `recognitionQualityMeasured: false`. Il est distinct de `evaluate:vision`, qui exige des annotations de photographies. Les outils de vision utilisent `HTTPS_PROXY` ou `HTTP_PROXY` lorsqu’il est configuré ; Chromium doit faire confiance au certificat du proxy. Dans cet environnement, sa base NSS doit être accessible en écriture pour être ouverte correctement. Aucune désactivation de la vérification TLS n’est utilisée.
+
 ## Évaluation réelle sur trois situations
 
 Préparer au moins :
@@ -56,6 +66,14 @@ Préparer au moins :
 | Aucun équipement ciblé visible | Mur ou zone vide autorisée, annotations vides | Zéro résultat possible ; faux positifs comptés s’il y en a |
 
 Les annotations portent sur les **objets visibles de la photo**, pas sur l’inventaire théorique de la salle. Un objet complètement hors champ ne doit pas être utilisé comme vérité terrain de détection sur cette vue.
+
+Plan pour les deux photos autorisées du propriétaire :
+
+- `20261016_145907.jpg` : vue paysage, équipements visibles ; annoter toutes les chaises et tables discernables, y compris aux bords.
+- `rn_image_picker_lib_temp_5f806735-a4ef-4693-b904-ebabf507e684.jpg` : vue portrait dense et nombreuses occlusions ; annoter les objets visibles, en consignant les ambiguïtés des rangées du fond.
+- Troisième situation proposée : recadrage du plafond de la photo portrait, sans mobilier ciblé. Consigner les coordonnées du recadrage et l’empreinte de la photo source ; annotations vides. Il s’agit d’une transformation de photo réelle, **pas d’une troisième prise de vue indépendante**. Les métriques de ce cas ne doivent pas être présentées comme celles d’un jeu de trois photos indépendantes.
+
+Ce plan n’est pas une annotation ni un résultat mesuré. Les boîtes seront établies et relues avant l’inférence. Les images resteront dans `.vision-data/`, ignoré par Git ; seules les annotations et preuves sans image seront publiées dans la PR.
 
 Créer un dossier `.vision-data/` (ignoré par Git) avec les photos et un fichier `manifest.json`. Format d’exemple à compléter manuellement ; les coordonnées ci-dessous illustrent le format et ne sont pas des annotations validées :
 
@@ -76,7 +94,7 @@ Classes admises : `chair`, `dining table`, `tv`, `laptop`. Boîtes `[x, y, large
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run evaluate:vision -- .vision-data/manifest.json
 ```
 
-L’outil utilise le même détecteur que l’application et produit `test-results/vision-evaluation.json`, sans copie d’image. Il conserve le backend, le seuil, les prédictions, la durée d’inférence et les métriques par cas.
+L’outil utilise le même détecteur que l’application et produit `test-results/vision-evaluation.json`, sans copie d’image. Il conserve le backend, le seuil, les prédictions, les annotations, les dimensions de l’image analysée, l’empreinte SHA-256 du fichier source, la durée d’inférence et les métriques par cas.
 
 Appariement : même classe, IoU ≥ 0,5, un objet annoté au plus par détection, ordre décroissant de confiance. Précision = vrais positifs / détections ; rappel = vrais positifs / objets annotés. Un dénominateur nul donne `null`, pas un taux de réussite artificiel. Les boîtes de prédiction et d’annotation sont comparées en coordonnées normalisées.
 

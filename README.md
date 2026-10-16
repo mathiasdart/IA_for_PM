@@ -54,6 +54,8 @@ Ces tests vérifient le parcours avec des médias synthétiques et des autorisat
 
 Pour l’évaluation réelle, voir [le protocole M2 et l’outil de mesure](docs/VALIDATION-M2.md). Les tests simulés et les mesures de vision sont comptabilisés séparément.
 
+Le vrai graphe COCO-SSD et ses poids ont désormais été téléchargés et exécutés sur la fixture synthétique existante (`npm run verify:vision-runtime`). Cela confirme le runtime et le parcours réseau, sans mesure de précision/rappel sur photographies. Les deux photos autorisées du propriétaire attendent leur transfert depuis son PC vers un emplacement accessible au cloud. M2 reste en recette et M3 attend sa validation explicite.
+
 ## Architecture
 
 Frontend statique HTML, CSS et JavaScript ES modules, assemblé par Vite. Aucune API métier ni base de données. TensorFlow.js 4.22.0 est une dépendance runtime versionnée, compilée dans un module chargé à la demande. Les poids du modèle sont téléchargés depuis Google Cloud Storage ; aucune image n’est envoyée à ce service.

@@ -1,9 +1,10 @@
 import { readFile, mkdir, writeFile, access } from 'node:fs/promises';
 import path from 'node:path';
-import { chromium } from '@playwright/test';
+import { createHash } from 'node:crypto';
 import { createServer } from 'vite';
 import { MODEL } from '../src/model-spec.js';
 import { measureDetections } from './vision-metrics.mjs';
+import { launchVisionBrowser } from './vision-browser.mjs';
 
 async function main() {
   if (!process.argv[2]) throw new Error('Usage : npm run evaluate:vision -- /chemin/manifest.json');
@@ -31,8 +32,7 @@ async function main() {
   let browser;
   try {
     await server.listen();
-    browser = await chromium.launch({ headless: true, args: ['--no-sandbox'],
-      ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH } : {}) });
+    browser = await launchVisionBrowser();
     const page = await browser.newPage();
     page.setDefaultTimeout(120_000);
     await page.goto('http://127.0.0.1:5174');
@@ -48,7 +48,9 @@ async function main() {
       });
       const predictions = result.predictions.filter((prediction) => prediction.score >= threshold).map((prediction) => ({ ...prediction,
         bbox: [prediction.bbox[0] / result.width, prediction.bbox[1] / result.height, prediction.bbox[2] / result.width, prediction.bbox[3] / result.height] }));
-      results.push({ id: item.id, inferenceMs: result.inferenceMs, backend: result.backend, truncated: result.truncated,
+      const sha256 = createHash('sha256').update(await readFile(item.resolvedFile)).digest('hex');
+      results.push({ id: item.id, sha256, width: result.width, height: result.height, expected: item.expected,
+        inferenceMs: result.inferenceMs, backend: result.backend, truncated: result.truncated,
         metrics: measureDetections(predictions, item.expected), predictions });
     }
     const totals = results.reduce((sum, item) => ({ truePositives: sum.truePositives + item.metrics.truePositives,
